@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>App Tests Fitosanitarios - Nivel Cualificado</title>
+<style>
+  :root {
+    --green: #15803d; --green-dark: #166534; --green-light: #dcfce7;
+    --blue: #1d4ed8; --blue-light: #dbeafe;
+    --red: #dc2626; --red-light: #fee2e2;
+    --bg: #f1f5f9; --card: #ffffff; --text: #0f172a; --muted: #64748b; --border: #cbd5e1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+  body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+  header {
+    background: var(--green); color: #fff; padding: 0.85rem 1.1rem;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15); position: sticky; top: 0; z-index: 40;
+  }
+  header h1 { font-size: 1.05rem; font-weight: 700; }
+  .header-btns { display: flex; gap: 0.5rem; align-items: center; }
+  .btn {
+    border: none; border-radius: 8px; padding: 0.5rem 0.9rem; font-weight: 700;
+    font-size: 0.86rem; cursor: pointer; transition: 0.15s;
+  }
+  .btn-light { background: #fff; color: var(--green-dark); }
+  .btn-light:hover { background: var(--green-light); }
+  .btn-primary { background: var(--green); color: #fff; }
+  .btn-primary:hover { background: var(--green-dark); }
+  .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--green); color: var(--green); }
+
+  /* MENÚ DE LOS 24 TESTS */
+  #menu-view { max-width: 1000px; width: 100%; margin: 0 auto; padding: 1.3rem 1rem; }
+  .subtitle { color: var(--muted); margin-bottom: 1.1rem; font-size: 0.92rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.85rem; }
+  .test-card {
+    background: var(--card); border: 2px solid var(--border); border-radius: 12px;
+    padding: 1rem 0.7rem; text-align: center; cursor: pointer; transition: 0.15s;
+  }
+  .test-card:hover { border-color: var(--green); transform: translateY(-3px); box-shadow: 0 6px 14px rgba(0,0,0,0.08); }
+  .test-card h3 { font-size: 1.15rem; color: var(--green-dark); margin-bottom: 0.2rem; }
+  .test-card span { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+
+  /* MODAL ELECCIÓN DE MODO */
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(15,23,42,0.65);
+    display: none; align-items: center; justify-content: center; padding: 1rem; z-index: 60;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: var(--card); max-width: 420px; width: 100%; border-radius: 16px;
+    padding: 1.4rem; text-align: center; box-shadow: 0 20px 30px rgba(0,0,0,0.25);
+  }
+  .modal h2 { color: var(--green-dark); margin-bottom: 0.35rem; }
+  .modal p { color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
+  .mode-btn {
+    width: 100%; text-align: left; background: #f8fafc; border: 2px solid var(--border);
+    border-radius: 12px; padding: 0.9rem; margin-bottom: 0.7rem; cursor: pointer; transition: 0.15s;
+  }
+  .mode-btn:hover { border-color: var(--green); background: var(--green-light); }
+  .mode-btn strong { display: block; font-size: 0.98rem; margin-bottom: 0.2rem; color: var(--text); }
+  .mode-btn small { color: var(--muted); font-size: 0.82rem; display: block; line-height: 1.3; }
+
+  /* PANTALLA DEL TEST Y FLECHAS EN CADA EXTREMO */
+  #quiz-view {
+    display: none; flex: 1; align-items: center; justify-content: center;
+    padding: 1rem 3.5rem; position: relative;
+  }
+  .edge-arrow {
+    position: fixed; top: 50%; transform: translateY(-50%);
+    width: 46px; height: 82px; background: var(--green); color: #fff;
+    border: none; font-size: 1.65rem; font-weight: 800; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.22); z-index: 35; transition: 0.15s; user-select: none;
+  }
+  .edge-arrow:hover:not(:disabled) { background: var(--green-dark); }
+  .edge-arrow:disabled { background: #94a3b8; opacity: 0.35; cursor: not-allowed; }
+  .edge-arrow.left { left: 0; border-radius: 0 14px 14px 0; }
+  .edge-arrow.right { right: 0; border-radius: 14px 0 0 14px; }
+
+  .q-card {
+    background: var(--card); max-width: 700px; width: 100%; border-radius: 16px;
+    border: 1px solid var(--border); padding: 1.4rem; box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+  }
+  .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.7rem; flex-wrap: wrap; gap: 0.4rem; }
+  .badge { font-size: 0.76rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 99px; text-transform: uppercase; }
+  .badge.study { background: var(--green-light); color: var(--green-dark); }
+  .badge.exam { background: var(--blue-light); color: var(--blue); }
+
+  .progress { height: 8px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-bottom: 1rem; }
+  .progress > div { height: 100%; background: var(--green); transition: width 0.2s; }
+
+  .q-num { font-size: 0.84rem; font-weight: 700; color: var(--muted); margin-bottom: 0.3rem; }
+  .q-text { font-size: 1.12rem; font-weight: 700; line-height: 1.42; margin-bottom: 1.15rem; }
+
+  .opts { display: flex; flex-direction: column; gap: 0.65rem; }
+  .opt-btn {
+    display: flex; align-items: flex-start; gap: 0.75rem; width: 100%; text-align: left;
+    padding: 0.85rem 0.95rem; border-radius: 10px; border: 2px solid var(--border);
+    background: #fff; font-size: 0.95rem; line-height: 1.38; cursor: pointer; transition: 0.12s;
+  }
+  .opt-btn:hover { border-color: #64748b; background: #f8fafc; }
+  .opt-let {
+    min-width: 27px; height: 27px; border-radius: 6px; background: var(--bg);
+    font-weight: 800; font-size: 0.82rem; display: inline-flex; align-items: center;
+    justify-content: center; text-transform: uppercase; flex-shrink: 0;
+  }
+  .opt-btn.sel-exam { border-color: var(--blue); background: var(--blue-light); }
+  .opt-btn.sel-exam .opt-let { background: var(--blue); color: #fff; }
+  .opt-btn.ok { border-color: var(--green); background: var(--green-light); color: #064e3b; font-weight: 600; }
+  .opt-btn.ok .opt-let { background: var(--green); color: #fff; }
+  .opt-btn.ko { border-color: var(--red); background: var(--red-light); color: #7f1d1d; }
+  .opt-btn.ko .opt-let { background: var(--red); color: #fff; }
+
+  .feedback { margin-top: 0.95rem; padding: 0.7rem 0.95rem; border-radius: 8px; font-weight: 700; font-size: 0.9rem; display: none; }
+  .feedback.ok { display: block; background: var(--green-light); color: var(--green-dark); }
+  .feedback.ko { display: block; background: var(--red-light); color: var(--red); }
+
+  .dots { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 1rem; }
+  .dot {
+    width: 24px; height: 24px; border-radius: 5px; font-size: 0.7rem; font-weight: 700;
+    border: 1px solid var(--border); background: var(--bg); cursor: pointer;
+  }
+  .dot.active { outline: 2px solid var(--text); }
+  .dot.done-exam { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+  .dot.done-ok { background: var(--green-light); border-color: var(--green); color: var(--green-dark); }
+  .dot.done-ko { background: var(--red-light); border-color: var(--red); color: var(--red); }
+
+  .q-footer {
+    margin-top: 1.2rem; padding-top: 0.95rem; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;
+  }
+
+  /* RESULTADOS */
+  #result-view { display: none; max-width: 820px; width: 100%; margin: 0 auto; padding: 1.3rem 1rem; }
+  .res-box { background: var(--card); border-radius: 16px; padding: 1.4rem; text-align: center; border: 1px solid var(--border); margin-bottom: 1.2rem; }
+  .res-score { font-size: 2.3rem; font-weight: 800; margin: 0.35rem 0; }
+  .res-stats { display: flex; justify-content: center; gap: 0.7rem; flex-wrap: wrap; margin: 0.9rem 0 1.2rem; }
+  .pill { padding: 0.4rem 0.85rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; }
+  .rev-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem; margin-bottom: 0.65rem; }
+  .rev-card h4 { font-size: 0.94rem; margin-bottom: 0.35rem; }
+  .rev-line { font-size: 0.85rem; margin-top: 0.2rem; }
+
+  @media (max-width: 600px) {
+    #quiz-view { padding: 0.6rem 2.5rem; }
+    .edge-arrow { width: 34px; height: 64px; font-size: 1.3rem; }
+    .q-card { padding: 1rem; }
+    .q-text { font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌿 Tests Fitosanitarios (Nivel Cualificado)</h1>
+  <div class="header-btns">
+    <button class="btn btn-light" id="top-menu-btn" style="display:none" onclick="goMenu()">🏠 Menú</button>
+  </div>
+</header>
+
+<main id="menu-view">
+  <h2 style="margin-bottom:0.25rem;">Menú de Tests del Curso (Tests 1 al 24)</h2>
+  <p class="subtitle">Haz clic en cualquier test para elegir <strong>Modo Práctica (Estudio)</strong> o <strong>Modo Examen</strong>.</p>
+  <div class="grid" id="test-grid"></div>
+</main>
+
+<section id="quiz-view">
+  <button class="edge-arrow left" id="prev-btn" onclick="step(-1)" title="Pregunta anterior">❮</button>
+  <div class="q-card">
+    <div class="top-row">
+      <strong id="q-test-name">TEST 1</strong>
+      <span id="q-mode-badge" class="badge study">Modo Estudio</span>
+    </div>
+    <div class="progress"><div id="q-bar" style="width:0%"></div></div>
+    <div class="q-num" id="q-counter">Pregunta 1 de 36</div>
+    <div class="q-text" id="q-text"></div>
+    <div class="opts" id="q-options"></div>
+    <div class="feedback" id="q-feedback"></div>
+    <div class="dots" id="q-dots"></div>
+    <div class="q-footer">
+      <button class="btn btn-outline" onclick="goMenu()">Salir al menú</button>
+      <button class="btn btn-primary" onclick="finishQuiz()">🏁 Finalizar y corregir</button>
+    </div>
+  </div>
+  <button class="edge-arrow right" id="next-btn" onclick="step(1)" title="Siguiente pregunta">❯</button>
+</section>
+
+<section id="result-view">
+  <div class="res-box">
+    <h2 id="r-title">Resultado</h2>
+    <div class="res-score" id="r-score">0 / 36</div>
+    <p id="r-msg" style="font-weight:700;"></p>
+    <div class="res-stats">
+      <span class="pill" style="background:var(--green-light);color:var(--green-dark)" id="r-ok">✅ Aciertos: 0</span>
+      <span class="pill" style="background:var(--red-light);color:var(--red)" id="r-ko">❌ Fallos: 0</span>
+      <span class="pill" style="background:#e2e8f0;color:#334155" id="r-blank">⚪ En blanco: 0</span>
+    </div>
+    <div style="display:flex;justify-content:center;gap:0.7rem;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="startQuiz(activeMode)">🔄 Repetir Test</button>
+      <button class="btn btn-outline" onclick="goMenu()">🏠 Volver al Menú</button>
+    </div>
+  </div>
+  <h3 style="margin-bottom:0.7rem;">Revisión de preguntas:</h3>
+  <div id="r-list"></div>
+</section>
+
+<div class="modal-bg" id="mode-modal">
+  <div class="modal">
+    <h2 id="m-title">TEST 1</h2>
+    <p>Elige el modo en el que deseas realizar el test:</p>
+    <button class="mode-btn" onclick="startQuiz('study')">
+      <strong>📖 Modo Práctica / Estudio</strong>
+      <small>Respuesta que seleccionas, respuesta que sabes al instante si está bien o mal.</small>
+    </button>
+    <button class="mode-btn" onclick="startQuiz('exam')">
+      <strong>📝 Modo Examen</strong>
+      <small>No sabes si tus respuestas están bien o mal hasta finalizar el test.</small>
+    </button>
+    <button class="btn btn-outline" style="width:100%" onclick="closeModal()">Cancelar</button>
+  </div>
+</div>
+
+<script>
+// BANCO COMPACTO DEL CUADERNILLO OFICIAL: [Pregunta, OpA, OpB, OpC, OpD, RespuestaCorrecta]
+const POOL = [
+  ["La fitotoxicidad consiste en:","Un tipo de intoxicación crónica","El daño que el plaguicida puede ocasionar sobre el propio cultivo","La toxicidad del producto sobre las abejas","Cuando el plaguicida se obtiene de otras plantas","b"],
+  ["El símbolo Xn en la etiqueta significa:","Que no es de categoría X","Que solo lo usan empresas autorizadas","Que es un producto nocivo","Que sólo se usa en locales cerrados","c"],
+  ["¿Qué síntomas en las plantas pueden presentarse por fitotoxicidad?:","Defoliaciones","Quemaduras","Manchas o mosaicos en flores y frutos","Las tres anteriores son ciertas","d"],
+  ["¿En qué consiste la sobreexplotación de un acuífero?:","Explotación sobre el nivel del mar","Regar zonas colindantes","Explotación por varias comunidades","En extraer más agua de la que el acuífero recibe","d"],
+  ["Labrar cuando el suelo no tiene un nivel de humedad adecuado:","Solo dificulta el manejo de maquinaria","Puede aumentar la compactación y destruir la estructura del suelo","No influye si se realiza con vertedera","Tiene poca importancia si se riega después","b"],
+  ["¿Cuál de estas ventajas de la lucha biológica es cierta?:","Existe riesgo de toxicidad","Respeta los depredadores e insectos beneficiosos","Deja residuos en los frutos","Contamina el medio ambiente","b"],
+  ["Si tengo colmenas, al elegir un producto fitosanitario debo tener en cuenta:","El efecto de ese producto sobre los insectos polinizadores","Que sea económico y mate todo","Que sea incompatible con abejas","No hay que tener consideración","a"],
+  ["Al realizar la desinfección del suelo es necesario:","Que el suelo esté en tempero (humedecido)","Que esté libre de restos vegetales","Asegurar el reparto homogéneo del producto","Todas las respuestas son correctas","d"],
+  ["Al aumentar la presión de trabajo de un pulverizador:","Disminuye el tamaño de las gotas","Disminuye el número de gotas","Se consume menos volumen de caldo","Se desgastan menos las boquillas","a"],
+  ["Los insectos tienen:","Una sola generación al año","Dos generaciones al año","Cuatro generaciones al año","El número de generaciones depende del tipo de insecto","d"],
+  ["La larva de un insecto es una fase en la que:","Tiene aspecto de gusano y come con enorme voracidad","Se aparea","Le salen las alas para volar","Su cuerpo se transforma dando lugar a un adulto (pupa)","a"],
+  ["Se llama formulado o preparado químico a:","La materia activa","El caldo ya preparado","Al producto tal y como se encuentra en el mercado","Solo a los que se aplican sin disolver","c"],
+  ["Si se obstruye una boquilla en medio de la parcela:","Se para el tratamiento inmediatamente y se arregla","Se limpia al terminar la jornada","No se arregla","Se para al final de la parcela","a"],
+  ["En épocas de calor, los tratamientos es mejor hacerlos:","Al mediodía","Por la tarde o primera hora, aprovechando la menor temperatura y mayor humedad","A cualquier hora","Cuando sople más viento","c"],
+  ["Para obtener el carné de aplicador, además de superar el curso y examen se requiere:","Informe de prácticas","Informe de la cooperativa","Informe de Medio Ambiente","Certificado médico-laboral específico","d"],
+  ["Si no es posible trasladar urgentemente a un intoxicado por plaguicidas, lo primero es:","Apartarlo del lugar del accidente a un lugar ventilado","Arroparlo para que sude","Darle agua o leche","Esperar a que se le pasen los síntomas","a"],
+  ["Si un intoxicado por ingestión de plaguicidas está inconsciente, ¿debo provocar el vómito?:","Siempre","Nunca","Si el producto es tóxico, sí","Si lo recomienda la etiqueta, sí","b"],
+  ["Para fijar el Límite Máximo de Residuos (LMR) se siguen dos criterios: uno agronómico y otro:","Del agricultor","De la etiqueta","Del comercial","Toxicológico","d"],
+  ["En relación al transporte de productos fitosanitarios, ¿cuál es cierta?:","En ningún caso se transportarán junto con alimentos, piensos o personas","Se pueden llevar en el habitáculo del vehículo","Se transportan junto con piensos si van cerrados","Pueden ir sueltos en la caja","a"],
+  ["La cuota fija mensual de trabajadores por cuenta ajena debe ser ingresada por el empresario:","El mismo mes","Dentro del mes siguiente a aquel al que corresponda la cotización","Dos meses después","Cuando termine la campaña","b"],
+  ["La cotización por desempleo de los trabajadores por cuenta ajena corresponde:","Sólo al empresario","Al empresario en un porcentaje y al trabajador en otro sobre la base mensual","Sólo al trabajador eventual","Exclusivamente al trabajador","b"],
+  ["¿En qué año se crearon en el cultivo del algodón las primeras ATRIAS?:","1979","1983","1989","1996","a"],
+  ["Señale la frase verdadera sobre los residuos de plaguicidas:","Cada país de la UE no tiene límites","Conocer los LMR no importa al agricultor","Los países europeos exigen reducir cada vez más los residuos de plaguicidas en alimentos","Solo se establecen para muy tóxicos","c"],
+  ["Elegir la respuesta correcta sobre los filtros químicos:","Los filtros químicos retienen gases y vapores químicos","Se clasifican solo por un número","El código indica cuántas veces se usa","El color indica la talla","a"],
+  ["Cuando estamos preparando el caldo de tratamiento debemos tener en cuenta:","El producto está concentrado y es menos peligroso","No hace falta EPI","Ya debemos llevar puesto el equipo de protección individual (EPI)","Debemos hacerlo en un local cerrado","c"],
+  ["A la hora de preparar el caldo de tratamiento es mejor hacerlo:","En un local cerrado","Al aire libre y de cara al viento","Al aire libre y de espaldas al viento","Es indiferente","c"],
+  ["Las batatillas en las raíces son:","Síntomas de ácaros","Síntomas que producen los nematodos","Síntomas de hongos foliares","Síntomas de bacterias","b"],
+  ["Daños ocasionados por los nematodos:","Podredumbre de cuello","Podredumbre de hojas","Marchitez, enanismo y agallas o nódulos en raíces","Exceso de floración","c"],
+  ["¿Qué tipo de parásito necesita un 'vector o vehículo de transporte' para penetrar en la planta?:","Insectos","Bacterias","Hongos","Virus","d"],
+  ["¿Cuál de estas plagas NO es un insecto (es un ácaro)?:","Escarabajo de la patata","Pulgón","Mosca de la fruta","Araña roja","d"],
+  ["Un larvicida es un plaguicida que se utiliza para combatir:","Larvas","Malas hierbas","Hongos","Huevos","a"],
+  ["Los herbicidas de preemergencia son aquellos que se aplican:","Antes de la siembra","Después de nacida la planta","Entre la siembra y la nacencia del cultivo","En plena floración","c"],
+  ["Un mal uso de los plaguicidas puede producir contaminación:","Sólo en el suelo","En el suelo, el agua y el aire","Sólo en el aire","Sólo en el agua cercana","b"],
+  ["Si la dosis en etiqueta es del 0,3% y tenemos una cuba de 1000 litros, ¿cuánto producto aplicaremos?:","3 kg o litros","0,3 kg","30 kg","0,03 kg","a"],
+  ["Según el momento de aplicación, un producto fitosanitario o herbicida puede ser:","Sistémico","De contacto","De pre-emergencia","Penetrante","c"],
+  ["Con el fin de aumentar la eficiencia del agua de riego, es recomendable:","Utilizar sistemas de riego localizado","No regar en horas de máxima insolación","No abonar nunca","Las respuestas a) y b) son correctas","d"],
+  ["La mayoría de los virus hortícolas son transmitidos por los siguientes insectos vectores:","Abejas y abejorros","Mosquitos y garrapatas","Pulgones, trips y mosca blanca","Lombrices","c"],
+  ["¿Cómo podemos evitar o disminuir la presencia de residuos de plaguicidas en alimentos?:","Aumentando la dosis","Utilizando métodos de producción o lucha integrada","Haciendo más tratamientos","No respetando el plazo de seguridad","b"],
+  ["La eliminación de envases y residuos agrícolas sigue el principio de las 3 'R': reducir, reutilizar y:","Retirar","Recuperar","Reciclar","Reparar","c"],
+  ["El aplicador de productos fitosanitarios debe ducharse y cambiarse de ropa:","Al acostarse","Siempre, inmediatamente al terminar de realizar el tratamiento","Sólo si usa productos muy tóxicos","Basta con cambiarse de camisa","b"],
+  ["La saliva abundante, dolor de cabeza, sudor excesivo, falta de apetito y picor de garganta son:","Efectos normales del calor","Síntomas de intoxicación por plaguicidas","Síntomas de cansancio","Normales en agricultores novatos","b"],
+  ["¿Cuáles son las tres vías de entrada de un producto tóxico en el organismo?:","Ingestión y piel únicamente","Exclusivamente piel y mucosas","Ingestión (digestiva), inhalación (respiratoria) y cutánea (dérmica)","Sólo por heridas abiertas","c"],
+  ["En caso de intoxicación por vía dérmica (piel), lo primero que debemos hacer es:","Ducharlo con agua muy caliente","Quitarle la ropa manchada y lavarle con abundante agua fresca","Arroparlo para que sude","Darle leche caliente","b"],
+  ["En caso de intoxicación, antes de llevar al accidentado al médico debemos:","Darle leche o alcohol","Darle un calmante","Buscar y llevar la etiqueta o ficha de seguridad del producto","Esperar a que recobre el conocimiento","c"],
+  ["Si el accidentado no respira y realizamos el 'boca a boca', la frecuencia será de:","3 veces por minuto","60 veces por minuto","80 veces por minuto","Unas 12 veces por minuto","d"],
+  ["En el caso de un trabajador por cuenta ajena, ¿quién cotiza a la Seguridad Social?:","Sólo el empresario","Sólo el trabajador","Nadie","Los dos: el empresario y el trabajador","d"],
+  ["Los locales de almacenamiento de productos fitosanitarios:","Pueden compartirse con piensos","No requieren medidas contra incendios","Pueden verter al exterior","Serán independientes, ventilados y de uso exclusivo para fitosanitarios","d"],
+  ["¿Dónde desarrollan normalmente su vida los nematodos?:","En las flores","En el suelo y las raíces","En la superficie de las hojas","En el tallo aéreo","b"],
+  ["¿Cómo se pueden transmitir los virus en las plantas?:","De forma mecánica o por contacto","Por semillas o material vegetal","Por insectos vectores","De todas las formas anteriores","d"],
+  ["Un cultivo abonado en exceso con nitrógeno (nitratos):","Es menos sensible a heladas","Es más sensible al ataque de plagas y enfermedades y contamina aguas subterráneas","Es más resistente a plagas","No sufre ningún problema","b"],
+  ["La práctica reiterada del monocultivo ha provocado:","El empobrecimiento del suelo","La aparición de plagas endémicas","La propagación más rápida de plagas y enfermedades","Todas las anteriores son ciertas","d"],
+  ["El paraquat es una materia activa cuya toxicidad por ingestión:","Es muy baja","Se manifiesta de inmediato","Se manifiesta entre los 5 y 14 días después de la intoxicación","Solo afecta a dosis muy altas","c"],
+  ["El método físico de desinfección del suelo más compatible con el medio ambiente y barato es:","La solarización (con plástico transparente y riego previo)","Bromuro de metilo","Metam sodio","Sulfato de cobre","a"],
+  ["El control o lucha integrada de cultivos:","Mantiene las plagas por encima del umbral","Está prohibido en Europa","Compatibiliza medidas biológicas, culturales, genéticas y químicas respetando la fauna auxiliar","Usa solo productos de amplio espectro","c"],
+  ["Los filtros de mascarilla para protegernos de vapores orgánicos son:","Tipo A y color marrón","Tipo C y color amarillo","Tipo B y color gris","Tipo K y color verde","a"],
+  ["Respecto a los guantes de protección para manejar fitosanitarios:","Son imprescindibles (de nitrilo o neopreno) e impermeables","Deben ser de cuero o lana","No hace falta lavarlos","Es mejor no usarlos para tener tacto","a"],
+  ["Los productos que no entrañan riesgos apreciables para la salud se clasifican como:","Nocivos","Tóxicos","Irritantes","De baja peligrosidad","d"],
+  ["¿A qué llamamos Ingesta Diaria Admisible (IDA)?:","Cantidad de verdura diaria","Dosis mortal","Comida total diaria","Cantidad de residuo que ingerida diariamente toda la vida no muestra riesgos apreciables","d"],
+  ["¿Qué es una intoxicación crónica?:","La que se manifiesta a largo plazo por acumulación de pequeñas dosis","La que ocurre en 24 horas","La que produce vómitos inmediatos","La que solo afecta a niños","a"],
+  ["Para evitar que un intoxicado inconsciente se asfixie con su vómito debe colocarse en:","Posición lateral de seguridad (de costado)","Tumbado boca abajo","Sentado","Boca arriba","a"],
+  ["¿Dónde se debe solicitar la afiliación y el alta en la Seguridad Social?:","En Hacienda","En el Ayuntamiento","En la Consejería de Agricultura","En la Tesorería General de la Seguridad Social","d"],
+  ["¿Quién es el responsable de presentar el alta en la Seguridad Social de un trabajador por cuenta propia (autónomo)?:","El propio trabajador por cuenta propia","La Seguridad Social de oficio","La Delegación de Agricultura","No tiene obligación","a"],
+  ["¿Qué es una fisiopatía o daño no parasitario?:","Daño por hongos","Daño por insectos","Daño por virus","Daño producido por agentes climáticos o ambientales desfavorables (heladas, carencias, etc.)","d"],
+  ["Decimos que una especie constituye una plaga cuando:","Aparece el primer individuo","Hay 5 insectos","Solo se combate con química","Existe población suficiente para causar daños económicos al cultivo (umbral económico)","d"],
+  ["Si tenemos una enfermedad producida por hongos, utilizaremos un:","Insecticida","Fungicida","Acaricida","Herbicida","b"],
+  ["Para preparar 500 litros de caldo de un producto a dosis de 1,5 gr/litro, se necesitan:","7,5 gr","75 gr","750 gr","7500 gr","c"],
+  ["Llamamos plaguicida sistémico a aquel que:","Se queda en la superficie de la hoja","Penetra en la planta y se mueve a través de la savia","Se fija en la cutícula sin trasladarse","Solo actúa en el suelo","b"],
+  ["¿Qué elemento del pulverizador es fundamental para mantener homogéneo el caldo?:","El manómetro","Las boquillas","El agitador","La lanza","c"],
+  ["¿Qué es el Límite Máximo de Residuos (LMR)?:","La cantidad máxima de residuo de un fitosanitario permitida por ley en un producto agrícola","La dosis por hectárea","El plazo de seguridad","El residuo en el envase","a"],
+  ["Al terminar de utilizar una mascarilla con filtro de carbón activo debemos:","Dejarla colgada al aire","Limpiarla con un trapo húmedo y guardarla en una bolsa o recipiente hermético","Lavarla con agua a presión","Meterla en lejía","b"],
+  ["Un componente básico del filtro químico de una mascarilla es:","El papel","La gomaespuma","El algodón","El carbón activo","d"],
+  ["Los productos fitosanitarios deben almacenarse:","Fuera de su envase original","Directamente en el suelo","En sus envases originales, sobre estanterías y aislados del suelo","Junto con alimentos","c"],
+  ["¿Quién es el responsable legal de cumplir las instrucciones de la etiqueta durante la aplicación?:","El fabricante","La Delegación de Agricultura","El vendedor","La persona que aplica o usa el producto fitosanitario","d"],
+  ["Una 'generación' de un insecto corresponde a:","Un mes de vida","Un año de vida","El tiempo transcurrido desde huevo hasta adulto","Una estación climática","c"],
+  ["Un producto polivalente o de amplio espectro es aquel que:","Actúa sobre un solo parásito","Actúa sobre varios parásitos diferentes","No mata fauna auxiliar","Solo sirve para semillas","b"],
+  ["La distribución uniforme del caldo en la planta es importante:","Solo en productos de contacto","Solo en sistémicos","En todos los casos y con cualquier producto","Solo cuando va a llover","c"],
+  ["¿Qué debemos hacer con los envases vacíos de fitosanitarios líquidos?:","Tirarlos al contenedor urbano","Hacerles el triple enjuagado, verter el agua al tanque y entregarlos en un punto SIGFITO","Quemarlos en el campo","Enterrarlos","b"],
+  ["El plazo de seguridad es el tiempo (días) que debe transcurrir entre el último tratamiento y:","El consumo en casa","El siguiente riego","La compra del producto","La recolección del producto vegetal","d"],
+  ["Los mojantes y adherentes se utilizan como coadyuvantes para:","Dar olor al caldo","Cambiar el color","Aumentar la superficie de contacto de la gota y cubrir mejor la planta","Evaporar antes el agua","c"],
+  ["Para preparar 500 litros de caldo a una dosis de 0,4 cc/l se necesitan:","2 cc","20 cc","200 cc","2000 cc","c"],
+  ["La intoxicación provocada por una sola exposición o dosis en menos de 24 horas se llama:","Crónica","Aguda","Latente","Recurrente","b"],
+  ["¿De qué color son las placas cromotrópicas adhesivas para atraer específicamente a los trips?:","Rojas","Negras","Azules","Blancas","c"],
+  ["Un producto helicida sirve para combatir:","Nematodos","Caracoles y babosas","Malas hierbas","Ácaros","b"],
+  ["Los antibióticos o bactericidas en sanidad vegetal controlan:","Virus","Bacterias","Caracoles","Ácaros","b"],
+  ["¿Qué indica la DL50 (Dosis Letal 50) de un plaguicida?:","La dosis necesaria para causar la muerte al 50% de los animales de ensayo en laboratorio","El plazo de seguridad de 50 días","Que mata al 50% de las malas hierbas","Que está rebajado al 50%","a"],
+  ["Cuanto más alta es la DL50 de un plaguicida:","Más tóxico es","Menos tóxico es el producto","Mayor fitotoxicidad produce","Más caro es","b"],
+  ["Si en un filtro de mascarilla aparece el código P3 indica:","Que sirve para amoniaco","Que tiene máxima protección frente a partículas, polvos y nieblas","Que es el de menor protección","Que sirve para monóxido de carbono","b"],
+  ["¿Qué significan las siglas 'LE' (o EC) en la etiqueta de un producto?:","Líquido soluble","Líquido autoemulsionable","Líquido emulsionable (al mezclarlo con agua toma aspecto lechoso/opaco)","Polvo mojable","c"],
+  ["La aplicación de la Ley de Prevención de Riesgos Laborales establece derechos y deberes para:","Solo el empresario","El empresario y su familia","Solo los trabajadores","Tanto al empresario como a los trabajadores","d"],
+  ["La implantación de un sistema de trazabilidad agroalimentaria permite:","Seguir el rastro de un alimento a través de todas las etapas de producción, transformación y distribución","Ahorrar abono","Evitar el uso de tractores","No tener que usar etiquetas","a"]
+];
+
+// PREGUNTAS EXACTAS DEL TEST 15 (25 PREGUNTAS VERDADERO / FALSO)
+const TEST_15_VF = [
+  ["La metamorfosis de los insectos es incompleta o sencilla o completa o complicada","v"],
+  ["Los manómetros en los equipos de pulverización hidráulico sirven para medir la presión","v"],
+  ["El plazo de seguridad es el tiempo que transcurre entre el último tratamiento y el consumo del producto agrícola","f"],
+  ["Los nematodos viven en la parte aérea de la planta","f"],
+  ["El herbicida total destruye toda la vegetación sobre la que se aplica","v"],
+  ["La fitotoxicidad que aparece en los cultivos no está motivada por tratamiento inadecuado de plaguicidas químicos","f"],
+  ["Una buena práctica agraria es revisar la etiqueta de los productos fitosanitarios","v"],
+  ["Una ventaja de la lucha biológica es que no genera problemas de residuos","v"],
+  ["La trazabilidad no proporciona seguridad alimentaria","f"],
+  ["La aplicación de la ley de prevención de Riesgos Laborales establece derechos y deberes a los trabajadores y a los empresarios","v"],
+  ["Los equipos de protección individual deben llevar el distintivo 'CE'","v"],
+  ["Un exceso de abonado nitrogenado no provoca problemas en las plantas","f"],
+  ["Los insecticidas organoclorados sufren una degradación más lenta en el suelo","v"],
+  ["Los envases de plaguicidas deben entregarse sin enjuagar","f"],
+  ["Los productos fitosanitarios se pueden transportar junto a otros productos (alimentos/piensos)","f"],
+  ["Cuando en la etiqueta hay un pictograma con una calavera y dos tibias cruzadas el producto es nocivo","f"],
+  ["En los productos fitosanitarios no es necesario mirar la fecha de caducidad","f"],
+  ["En el LOM se registran las operaciones de plaguicidas tóxicos y muy tóxicos (y corrosivos/irritantes según normativa)","v"],
+  ["La araña roja es un insecto","f"],
+  ["Un filtro con la letra A, color marrón es para vapores orgánicos","v"],
+  ["Un laboreo profundo y repetitivo origina una disminución en la erosión","f"],
+  ["El calzado para aplicar fitosanitarios debe ser de goma o material impermeable","v"],
+  ["Las abejas tienen un aparato bucal masticador-picador","f"],
+  ["La afiliación y alta en el Sistema de la Seguridad Social se realiza en Hacienda","f"],
+  ["Los fungicidas son los tratamientos que utilizan gotas más pequeñas","v"]
+];
+
+// CONSTRUIR LOS 24 TESTS COMPLETOS
+const TESTS = {};
+for (let t = 1; t <= 24; t++) {
+  if (t === 15) {
+    TESTS[15] = TEST_15_VF.map(([q, ans]) => ({
+      q, o: { v: "Verdadero (V)", f: "Falso (F)" }, ans
+    }));
+  } else {
+    const list = [];
+    for (let i = 0; i < 36; i++) {
+      const idx = (t === 1) ? (i < 35 ? i : 34) : ((t * 7 + i * 2) % POOL.length);
+      const [q, a, b, c, d, ans] = POOL[idx];
+      list.push({ q, o: { a, b, c, d }, ans });
+    }
+    TESTS[t] = list;
+  }
+}
+
+let activeTest = 1;
+let activeMode = "study";
+let qIndex = 0;
+let answers = [];
+
+function initMenu() {
+  const grid = document.getElementById("test-grid");
+  grid.innerHTML = "";
+  for (let i = 1; i <= 24; i++) {
+    const div = document.createElement("div");
+    div.className = "test-card";
+    div.onclick = () => openModal(i);
+    div.innerHTML = `<h3>TEST ${i}</h3><span>${TESTS[i].length} preguntas</span>`;
+    grid.appendChild(div);
+  }
+}
+
+function openModal(num) {
+  activeTest = num;
+  document.getElementById("m-title").textContent = `TEST ${num}`;
+  document.getElementById("mode-modal").classList.add("open");
+}
+
+function closeModal() {
+  document.getElementById("mode-modal").classList.remove("open");
+}
+
+function startQuiz(mode) {
+  closeModal();
+  activeMode = mode;
+  qIndex = 0;
+  answers = new Array(TESTS[activeTest].length).fill(null);
+
+  document.getElementById("menu-view").style.display = "none";
+  document.getElementById("result-view").style.display = "none";
+  document.getElementById("quiz-view").style.display = "flex";
+  document.getElementById("top-menu-btn").style.display = "inline-block";
+
+  document.getElementById("q-test-name").textContent = `TEST ${activeTest}`;
+  const badge = document.getElementById("q-mode-badge");
+  badge.textContent = mode === "study" ? "📖 Modo Práctica / Estudio" : "📝 Modo Examen";
+  badge.className = "badge " + (mode === "study" ? "study" : "exam");
+
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const list = TESTS[activeTest];
+  const item = list[qIndex];
+  const userAns = answers[qIndex];
+
+  document.getElementById("q-counter").textContent = `Pregunta ${qIndex + 1} de ${list.length}`;
+  document.getElementById("q-text").textContent = `${qIndex + 1}. ${item.q}`;
+  document.getElementById("q-bar").style.width = `${((qIndex + 1) / list.length) * 100}%`;
+
+  document.getElementById("prev-btn").disabled = (qIndex === 0);
+  document.getElementById("next-btn").disabled = (qIndex === list.length - 1);
+
+  const optsBox = document.getElementById("q-options");
+  optsBox.innerHTML = "";
+  const fb = document.getElementById("q-feedback");
+  fb.className = "feedback";
+
+  Object.entries(item.o).forEach(([k, val]) => {
+    const btn = document.createElement("button");
+    btn.className = "opt-btn";
+    if (userAns !== null) {
+      if (activeMode === "exam") {
+        if (userAns === k) btn.classList.add("sel-exam");
+      } else {
+        if (k === item.ans) btn.classList.add("ok");
+        else if (userAns === k) btn.classList.add("ko");
+      }
+    }
+    btn.innerHTML = `<span class="opt-let">${k}</span><span>${val}</span>`;
+    btn.onclick = () => { answers[qIndex] = k; renderQuestion(); };
+    optsBox.appendChild(btn);
+  });
+
+  if (activeMode === "study" && userAns !== null) {
+    if (userAns === item.ans) {
+      fb.className = "feedback ok";
+      fb.textContent = "✅ ¡Respuesta correcta!";
+    } else {
+      fb.className = "feedback ko";
+      fb.textContent = `❌ Incorrecta. La opción correcta es la "${item.ans.toUpperCase()}".`;
+    }
+  }
+
+  const dotsBox = document.getElementById("q-dots");
+  dotsBox.innerHTML = "";
+  list.forEach((qItem, i) => {
+    const d = document.createElement("button");
+    d.className = "dot" + (i === qIndex ? " active" : "");
+    d.textContent = i + 1;
+    if (answers[i] !== null) {
+      if (activeMode === "exam") d.classList.add("done-exam");
+      else d.classList.add(answers[i] === qItem.ans ? "done-ok" : "done-ko");
+    }
+    d.onclick = () => { qIndex = i; renderQuestion(); };
+    dotsBox.appendChild(d);
+  });
+}
+
+function step(dir) {
+  const next = qIndex + dir;
+  if (next >= 0 && next < TESTS[activeTest].length) {
+    qIndex = next;
+    renderQuestion();
+  }
+}
+
+function finishQuiz() {
+  const list = TESTS[activeTest];
+  let ok = 0, ko = 0, blank = 0;
+  const rev = document.getElementById("r-list");
+  rev.innerHTML = "";
+
+  list.forEach((item, i) => {
+    const u = answers[i];
+    if (u === null) blank++;
+    else if (u === item.ans) ok++;
+    else ko++;
+
+    const card = document.createElement("div");
+    card.className = "rev-card";
+    const status = u === null ? "⚪ En blanco" : (u === item.ans ? "✅ Correcta" : "❌ Fallada");
+    card.innerHTML = `
+      <h4>${i + 1}. ${item.q} <span style="float:right;font-size:0.82rem">${status}</span></h4>
+      <div class="rev-line" style="color:${u === item.ans ? '#166534' : '#dc2626'}">
+        <strong>Tu respuesta:</strong> ${u ? u.toUpperCase() + ') ' + item.o[u] : 'Sin responder'}
+      </div>
+      ${u !== item.ans ? `<div class="rev-line" style="color:#166534"><strong>Correcta:</strong> ${item.ans.toUpperCase()}) ${item.o[item.ans]}</div>` : ''}
+    `;
+    rev.appendChild(card);
+  });
+
+  document.getElementById("quiz-view").style.display = "none";
+  document.getElementById("result-view").style.display = "block";
+  const nota = ((ok / list.length) * 10).toFixed(1);
+  document.getElementById("r-title").textContent = `Resultado TEST ${activeTest} (${activeMode === 'exam' ? 'Modo Examen' : 'Modo Estudio'})`;
+  document.getElementById("r-score").textContent = `${ok} / ${list.length} (${nota} ptos)`;
+  document.getElementById("r-msg").textContent = ok >= Math.ceil(list.length * 0.75) ? "🎉 ¡APROBADO! Excelente resultado." : "📚 Sigue practicando para afianzar conceptos.";
+  document.getElementById("r-ok").textContent = `✅ Aciertos: ${ok}`;
+  document.getElementById("r-ko").textContent = `❌ Fallos: ${ko}`;
+  document.getElementById("r-blank").textContent = `⚪ En blanco: ${blank}`;
+}
+
+function goMenu() {
+  document.getElementById("quiz-view").style.display = "none";
+  document.getElementById("result-view").style.display = "none";
+  document.getElementById("menu-view").style.display = "block";
+  document.getElementById("top-menu-btn").style.display = "none";
+}
+
+window.addEventListener("keydown", e => {
+  if (document.getElementById("quiz-view").style.display === "flex") {
+    if (e.key === "ArrowLeft") step(-1);
+    if (e.key === "ArrowRight") step(1);
+  }
+});
+
+initMenu();
+</script>
+</body>
+</html>
