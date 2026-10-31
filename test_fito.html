@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tests Grupo Forma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rojo: #d7141a; --rojo-osc: #a90f14;
+    --negro: #141414;
+    --fondo: #eef0f2; --papel: #ffffff; --hover: #f6f7f8;
+    --linea: #dcdfe3; --linea-fuerte: #b8bdc4;
+    --texto: #141414; --suave: #5a6068;
+    --ok: #1d7a3e; --ok-claro: #e4f3e9;
+    --ko: #b42318; --ko-claro: #fdecea;
+    --radio: 10px;
+    --font: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: var(--font); background: var(--fondo); color: var(--texto);
+    min-height: 100vh; display: flex; flex-direction: column; line-height: 1.45;
+  }
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--negro); outline-offset: 2px; }
+  .icon {
+    width: 20px; height: 20px; flex-shrink: 0; fill: none; stroke: currentColor;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  .wrap { max-width: 1100px; margin: 0 auto; padding-left: 1rem; padding-right: 1rem; }
+
+  /* CABECERA DE MARCA */
+  header { background: var(--papel); position: sticky; top: 0; z-index: 40; border-bottom: 3px solid var(--rojo); }
+  .bar { height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .brand { display: flex; align-items: center; gap: 0.65rem; min-width: 0; background: none; border: none; border-radius: 6px; }
+  .brand-mark {
+    display: grid; place-items: center; width: 34px; height: 34px; border-radius: 6px; flex-shrink: 0;
+    background: var(--rojo); color: #fff; font-weight: 800; font-stretch: 75%; font-size: 1rem; letter-spacing: 0.02em;
+  }
+  .brand-name { font-weight: 800; font-stretch: 85%; font-size: 1.25rem; letter-spacing: -0.01em; white-space: nowrap; }
+  .brand-sub {
+    color: var(--suave); font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    padding-left: 0.65rem; border-left: 1px solid var(--linea);
+  }
+
+  /* PIE */
+  footer { margin-top: auto; background: var(--papel); border-top: 1px solid var(--linea); }
+  footer .wrap { padding-top: 1.1rem; padding-bottom: 1.1rem; color: var(--suave); font-size: 0.85rem; }
+
+  /* BOTONES */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
+    border-radius: 8px; padding: 0.7rem 1.15rem; font-weight: 600; font-size: 0.95rem;
+    border: 1px solid transparent; transition: background 0.15s, border-color 0.15s;
+  }
+  .btn-primary { background: var(--rojo); color: #fff; }
+  .btn-primary:hover { background: var(--rojo-osc); }
+  .btn-secondary { background: var(--papel); border-color: var(--linea-fuerte); }
+  .btn-secondary:hover { border-color: var(--negro); }
+  .btn-dark { background: var(--negro); color: #fff; }
+  .btn-dark:hover { background: #2e3136; }
+  .btn:disabled { background: var(--fondo); border-color: var(--linea); color: var(--suave); cursor: not-allowed; }
+  .btn-block { width: 100%; }
+
+  /* MENÚ: TITULACIONES Y TESTS */
+  #menu-view { width: 100%; }
+  .page-title {
+    font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 800; font-stretch: 78%;
+    line-height: 1.05; letter-spacing: -0.015em;
+  }
+  .page-lead { color: var(--suave); margin-top: 0.45rem; font-size: 1rem; max-width: 60ch; }
+
+  .plate {
+    display: grid; place-items: center; width: 64px; height: 44px; border-radius: 6px; flex-shrink: 0;
+    background: var(--negro); color: #fff; font-weight: 800; font-stretch: 72%;
+    font-size: 1.05rem; letter-spacing: 0.03em;
+  }
+
+  /* BIENVENIDA CON BUSCADOR */
+  .hero { background: var(--negro); color: #fff; }
+  .hero .wrap { padding-top: 3rem; padding-bottom: 2.5rem; }
+  .hero h1 {
+    font-size: clamp(2.4rem, 7.5vw, 4rem); font-weight: 800; font-stretch: 72%;
+    line-height: 0.98; letter-spacing: -0.02em;
+  }
+  .hero p { color: #b7bbc1; margin-top: 0.75rem; font-size: 1.05rem; max-width: 48ch; }
+  .search-box { position: relative; display: block; margin-top: 1.6rem; max-width: 560px; }
+  .search-box .icon { position: absolute; left: 0.95rem; top: 50%; transform: translateY(-50%); color: var(--suave); pointer-events: none; }
+  .search {
+    width: 100%; height: 52px; padding: 0 1rem 0 2.8rem; font-size: 1rem;
+    border: none; border-radius: var(--radio); background: var(--papel); color: var(--texto);
+  }
+  .search::placeholder { color: var(--suave); }
+  .search:focus { outline: none; box-shadow: 0 0 0 3px var(--rojo); }
+
+  /* SECCIONES DE LA PANTALLA PRINCIPAL */
+  .home-body { padding-top: 2.25rem; padding-bottom: 3.5rem; }
+  .section-title { font-size: 1.15rem; font-weight: 800; font-stretch: 85%; margin-bottom: 0.9rem; }
+  .sec-soon { margin-top: 2.75rem; }
+  .sec-soon .section-title { font-size: 0.95rem; font-weight: 700; font-stretch: 100%; color: var(--suave); }
+
+  /* TARJETA DE TITULACIÓN DISPONIBLE */
+  .avail-grid { display: grid; gap: 1rem; }
+  .avail-card {
+    display: grid; grid-template-columns: auto 1fr; gap: 1.25rem; align-items: start;
+    background: var(--papel); border: 1px solid var(--linea); border-radius: 16px; padding: 1.5rem;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+  .avail-card:hover { transform: translateY(-3px); border-color: var(--linea-fuerte); box-shadow: 0 16px 32px -16px rgba(20,20,20,0.3); }
+  .plate-red { background: var(--rojo); width: 96px; height: 66px; font-size: 1.6rem; }
+  .avail-info { min-width: 0; }
+  .avail-name { font-size: clamp(1.4rem, 3.6vw, 2rem); font-weight: 800; font-stretch: 78%; line-height: 1.08; letter-spacing: -0.01em; }
+  .avail-level { font-weight: 600; margin-top: 0.4rem; }
+  .avail-count { color: var(--suave); font-size: 0.92rem; margin-top: 0.1rem; }
+  .avail-side { grid-column: 1 / -1; padding-top: 1.1rem; border-top: 1px solid var(--linea); }
+  .prog-text { font-size: 0.92rem; color: var(--suave); margin-bottom: 0.5rem; }
+  .prog-text strong { color: var(--texto); font-weight: 700; }
+  .prog-bar { height: 8px; background: var(--fondo); border-radius: 99px; overflow: hidden; }
+  .prog-bar div { height: 100%; background: var(--negro); border-radius: 99px; transition: width 0.4s ease; }
+  .avail-actions { display: flex; gap: 0.6rem; margin-top: 1.1rem; }
+  .avail-actions .btn { flex: 1; white-space: nowrap; }
+
+  /* CUADRÍCULA DE PRÓXIMAMENTE */
+  .soon-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; }
+  .soon-card {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 0.55rem;
+    background: #f6f7f8; border: 1px solid var(--linea); border-radius: var(--radio); padding: 0.85rem;
+  }
+  .soon-card .plate { width: 52px; height: 34px; font-size: 0.88rem; background: transparent; color: var(--suave); border: 1px dashed var(--linea-fuerte); }
+  .soon-name { font-weight: 600; font-size: 0.9rem; line-height: 1.3; color: #41464c; }
+  .soon-cat { font-size: 0.78rem; color: var(--suave); margin-top: -0.35rem; }
+
+  .empty { background: var(--papel); border: 1px dashed var(--linea-fuerte); border-radius: 12px; padding: 2rem 1rem; text-align: center; }
+  .empty p { color: var(--suave); margin-bottom: 1rem; }
+
+  @media (min-width: 600px) {
+    .soon-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (min-width: 900px) {
+    .soon-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .avail-card { grid-template-columns: auto 1fr minmax(320px, 400px); gap: 1.75rem; padding: 1.75rem; align-items: center; }
+    .avail-side { grid-column: 3; padding: 0 0 0 1.75rem; border-top: none; border-left: 1px solid var(--linea); }
+  }
+
+  .tit-body { padding-top: 1.75rem; padding-bottom: 3rem; }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 0.2rem; margin: -0.4rem 0 1rem -0.35rem; padding: 0.4rem 0.35rem;
+    background: none; border: none; color: var(--suave); font-weight: 600; font-size: 0.92rem; border-radius: 6px;
+  }
+  .back-link:hover { color: var(--texto); }
+  .back-link .icon { width: 18px; height: 18px; }
+  .tit-head { display: flex; align-items: center; gap: 1.1rem; }
+  .plate-lg { width: 88px; height: 60px; font-size: 1.4rem; flex-shrink: 0; background: var(--rojo); }
+
+  .tit-summary {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 1.5rem;
+    background: var(--papel); border: 1px solid var(--linea); border-radius: 14px;
+  }
+  .sum-item { display: flex; flex-direction: column; gap: 0.2rem; padding: 1rem 1.25rem; border-left: 1px solid var(--linea); }
+  .sum-item:first-child { border-left: none; }
+  .sum-item b { font-size: 2rem; font-weight: 800; font-stretch: 75%; line-height: 1; }
+  .sum-item b small { font-size: 1.05rem; color: var(--suave); font-weight: 700; }
+  .sum-item span { color: var(--suave); font-size: 0.85rem; line-height: 1.25; }
+
+  .level { margin-top: 2.25rem; }
+  .level-name { font-size: 1.6rem; font-weight: 800; font-stretch: 78%; margin-bottom: 1rem; }
+  .level-head {
+    display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 0.25rem 1rem;
+    padding-bottom: 0.6rem; margin-bottom: 1rem; border-bottom: 2px solid var(--negro);
+  }
+  .level-head h2 { font-size: 1.35rem; font-weight: 800; font-stretch: 82%; }
+  .level-head p { color: var(--suave); font-size: 0.9rem; }
+
+  .modes { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 2.25rem; }
+  .mode-card {
+    display: flex; flex-direction: column; align-items: flex-start;
+    background: var(--papel); border: 1px solid var(--linea); border-radius: 14px; padding: 1.4rem;
+  }
+  .mode-icon {
+    display: grid; place-items: center; width: 46px; height: 46px; border-radius: 10px;
+    background: var(--negro); color: #fff; margin-bottom: 0.9rem;
+  }
+  .mode-card:first-child .mode-icon { background: var(--rojo); }
+  .mode-card h3 { font-size: 1.5rem; font-weight: 800; font-stretch: 78%; line-height: 1.1; }
+  .mode-card p { color: var(--suave); margin: 0.3rem 0 1.1rem; flex: 1; }
+  @media (min-width: 700px) {
+    .modes { grid-template-columns: 1fr 1fr; }
+  }
+  .test-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 0.6rem; }
+  .test-tile {
+    display: flex; flex-direction: column; align-items: flex-start; text-align: left;
+    padding: 0.7rem 0.85rem 0.8rem; background: var(--papel); border: 1px solid var(--linea);
+    border-radius: var(--radio); transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .test-tile:hover { border-color: var(--negro); box-shadow: inset 0 -3px 0 var(--rojo); }
+  .test-label { font-size: 0.8rem; color: var(--suave); font-weight: 600; }
+  .test-num { font-size: 2.2rem; font-weight: 800; font-stretch: 72%; line-height: 1; letter-spacing: -0.02em; margin-top: 0.1rem; }
+  .test-q { font-size: 0.78rem; color: var(--suave); margin-top: 0.4rem; line-height: 1.25; }
+  .test-tile.aprobado { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok); }
+  .test-tile.suspendido { border-color: var(--ko); box-shadow: inset 0 0 0 1px var(--ko); }
+  .test-tile.aprobado:hover { border-color: var(--ok); box-shadow: inset 0 0 0 1px var(--ok), inset 0 -4px 0 var(--ok); }
+  .test-tile.suspendido:hover { border-color: var(--ko); box-shadow: inset 0 0 0 1px var(--ko), inset 0 -4px 0 var(--ko); }
+  .test-nota { display: inline-flex; align-items: center; gap: 0.25rem; margin-top: 0.4rem; font-size: 0.85rem; font-weight: 700; }
+  .test-nota .icon { width: 14px; height: 14px; stroke-width: 3; }
+  .aprobado .test-nota { color: var(--ok); }
+  .suspendido .test-nota { color: var(--ko); }
+
+  /* VENTANA ELECCIÓN DE MODO (hoja inferior en móvil, diálogo en escritorio) */
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(20,20,20,0.55);
+    display: none; align-items: flex-end; justify-content: center; z-index: 60;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: var(--papel); width: 100%; max-width: 460px; border-radius: 16px 16px 0 0;
+    padding: 1.5rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom)); animation: sheet 0.2s ease-out;
+  }
+  @keyframes sheet { from { transform: translateY(24px); opacity: 0; } }
+  @keyframes pop { from { transform: scale(0.97); opacity: 0; } }
+  .modal:focus { outline: none; }
+  .modal-sub { color: var(--suave); font-size: 0.88rem; }
+  .modal h2 { font-size: 2rem; font-weight: 800; font-stretch: 78%; line-height: 1.1; margin-top: 0.1rem; }
+  .modal-info { color: var(--suave); font-size: 0.9rem; margin: 0.2rem 0 1.25rem; }
+  .mode-btn {
+    display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0.2rem 1rem;
+    width: 100%; text-align: left; padding: 1rem; margin-bottom: 0.6rem;
+    background: var(--papel); border: 1px solid var(--linea-fuerte); border-radius: var(--radio);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .mode-btn:hover { border-color: var(--negro); background: var(--hover); }
+  .mode-name { font-weight: 700; font-size: 1.05rem; }
+  .mode-desc { grid-column: 1; color: var(--suave); font-size: 0.88rem; line-height: 1.35; }
+  .mode-btn .icon { grid-column: 2; grid-row: 1 / span 2; color: var(--rojo); }
+  .modal .btn-block { margin-top: 0.4rem; }
+
+  /* PANTALLA DEL TEST Y FLECHAS EN CADA EXTREMO */
+  #quiz-view {
+    display: none; flex: 1; align-items: flex-start; justify-content: center;
+    padding: 1.5rem 4rem 2.5rem;
+  }
+  .edge-arrow {
+    position: fixed; top: 50%; transform: translateY(-50%);
+    width: 44px; height: 88px; background: var(--negro); color: #fff; border: none;
+    display: flex; align-items: center; justify-content: center; z-index: 35; transition: background 0.15s;
+  }
+  .edge-arrow .icon { width: 24px; height: 24px; stroke-width: 2.5; }
+  .edge-arrow:hover:not(:disabled) { background: var(--rojo); }
+  .edge-arrow:disabled { background: var(--linea-fuerte); opacity: 0.5; cursor: not-allowed; }
+  .edge-arrow.left { left: 0; border-radius: 0 10px 10px 0; }
+  .edge-arrow.right { right: 0; border-radius: 10px 0 0 10px; }
+
+  .q-card { background: var(--papel); max-width: 720px; width: 100%; border: 1px solid var(--linea); border-radius: 14px; padding: 1.5rem; }
+  .top-row { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
+  #q-test-name { font-weight: 800; font-stretch: 82%; font-size: 1.25rem; }
+  .badge { font-size: 0.8rem; font-weight: 600; padding: 0.3rem 0.75rem; border-radius: 999px; border: 1px solid; }
+  .badge.study { color: var(--texto); border-color: var(--linea-fuerte); background: var(--fondo); }
+  .badge.exam { color: #fff; border-color: var(--negro); background: var(--negro); }
+
+  .progress { height: 4px; background: var(--linea); border-radius: 99px; overflow: hidden; margin-bottom: 1.25rem; }
+  .progress > div { height: 100%; background: var(--rojo); transition: width 0.2s; }
+
+  .q-num { font-size: 0.85rem; font-weight: 600; color: var(--suave); margin-bottom: 0.35rem; }
+  .q-text { font-size: 1.2rem; font-weight: 700; line-height: 1.4; margin-bottom: 1.25rem; }
+
+  .opts { display: flex; flex-direction: column; gap: 0.6rem; }
+  .opt-btn {
+    display: flex; align-items: flex-start; gap: 0.8rem; width: 100%; text-align: left;
+    padding: 0.85rem 1rem; border-radius: var(--radio); border: 1px solid var(--linea-fuerte);
+    background: var(--papel); font-size: 1rem; line-height: 1.4; transition: border-color 0.12s, background 0.12s;
+  }
+  .opt-btn:hover { border-color: var(--negro); }
+  .opt-let {
+    min-width: 28px; height: 28px; border-radius: 6px; background: var(--fondo);
+    font-weight: 700; font-size: 0.85rem; display: inline-flex; align-items: center;
+    justify-content: center; text-transform: uppercase; flex-shrink: 0;
+  }
+  .opt-btn.sel-exam { border-color: var(--negro); background: var(--hover); box-shadow: inset 0 0 0 1px var(--negro); }
+  .opt-btn.sel-exam .opt-let { background: var(--negro); color: #fff; }
+  .opt-btn.ok { border-color: var(--ok); background: var(--ok-claro); box-shadow: inset 0 0 0 1px var(--ok); }
+  .opt-btn.ok .opt-let { background: var(--ok); color: #fff; }
+  .opt-btn.ko { border-color: var(--ko); background: var(--ko-claro); box-shadow: inset 0 0 0 1px var(--ko); }
+  .opt-btn.ko .opt-let { background: var(--ko); color: #fff; }
+
+  .feedback { margin-top: 1rem; padding: 0.75rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.95rem; display: none; }
+  .feedback.ok { display: block; background: var(--ok-claro); color: var(--ok); border-left: 3px solid var(--ok); }
+  .feedback.ko { display: block; background: var(--ko-claro); color: var(--ko); border-left: 3px solid var(--ko); }
+
+  .dots { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 1.4rem; }
+  .dot {
+    width: 32px; height: 32px; border-radius: 6px; font-size: 0.78rem; font-weight: 600;
+    border: 1px solid var(--linea); background: var(--papel); color: var(--suave);
+  }
+  .dot.active { border-color: var(--negro); color: var(--negro); box-shadow: inset 0 0 0 1px var(--negro); }
+  .dot.done-exam { background: var(--negro); border-color: var(--negro); color: #fff; }
+  .dot.done-ok { background: var(--ok-claro); border-color: var(--ok); color: var(--ok); }
+  .dot.done-ko { background: var(--ko-claro); border-color: var(--ko); color: var(--ko); }
+  .dot.active.done-exam { box-shadow: 0 0 0 2px var(--papel), 0 0 0 4px var(--negro); }
+
+  .q-footer {
+    margin-top: 1.5rem; padding-top: 1.1rem; border-top: 1px solid var(--linea);
+    display: flex; justify-content: space-between; gap: 0.6rem; flex-wrap: wrap;
+  }
+
+  /* RESULTADOS */
+  #result-view { display: none; max-width: 760px; width: 100%; margin: 0 auto; padding: 1.75rem 1rem 3rem; }
+  .res-box {
+    background: var(--papel); border: 1px solid var(--linea); border-top: 4px solid var(--negro);
+    border-radius: 14px; padding: 1.5rem; margin-bottom: 2rem;
+  }
+  .res-box.pass { border-top-color: var(--ok); }
+  .res-box.fail { border-top-color: var(--rojo); }
+  .res-sub { color: var(--suave); font-size: 0.92rem; }
+  .res-verdict { font-size: 2.2rem; font-weight: 800; font-stretch: 78%; line-height: 1.1; margin-top: 0.15rem; }
+  .pass .res-verdict { color: var(--ok); }
+  .fail .res-verdict { color: var(--rojo); }
+  .res-score { display: flex; align-items: baseline; gap: 0.9rem; flex-wrap: wrap; margin-top: 1rem; }
+  .res-big { font-size: 3.6rem; font-weight: 800; font-stretch: 72%; line-height: 1; letter-spacing: -0.02em; }
+  .res-big small { font-size: 1.6rem; color: var(--suave); font-weight: 700; }
+  .res-nota { color: var(--suave); font-weight: 600; }
+  .res-help { color: var(--suave); font-size: 0.9rem; margin-top: 0.4rem; }
+  .res-extra { margin-top: 0.9rem; padding: 0.75rem 1rem; border-radius: 8px; background: var(--fondo); font-weight: 600; }
+  .res-stats {
+    display: flex; gap: 2rem; flex-wrap: wrap; margin: 1.25rem 0;
+    padding: 1rem 0; border-top: 1px solid var(--linea); border-bottom: 1px solid var(--linea);
+  }
+  .stat { display: flex; flex-direction: column; }
+  .stat b { font-size: 1.6rem; font-weight: 800; font-stretch: 80%; line-height: 1.1; }
+  .stat span { font-size: 0.85rem; color: var(--suave); }
+  .stat.ok b { color: var(--ok); }
+  .stat.ko b { color: var(--ko); }
+  .res-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .rev-title { font-size: 1.35rem; font-weight: 800; font-stretch: 82%; margin-bottom: 0.9rem; }
+  .rev-card {
+    background: var(--papel); border: 1px solid var(--linea); border-left: 4px solid var(--linea-fuerte);
+    border-radius: var(--radio); padding: 0.9rem 1rem; margin-bottom: 0.6rem;
+  }
+  .rev-card.ok { border-left-color: var(--ok); }
+  .rev-card.ko { border-left-color: var(--ko); }
+  .rev-head { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.82rem; font-weight: 700; color: var(--suave); margin-bottom: 0.25rem; }
+  .rev-card.ok .rev-status { color: var(--ok); }
+  .rev-card.ko .rev-status { color: var(--ko); }
+  .rev-q { font-weight: 600; line-height: 1.4; margin-bottom: 0.4rem; }
+  .rev-line { font-size: 0.9rem; color: var(--suave); margin-top: 0.15rem; }
+  .rev-line strong { color: var(--texto); font-weight: 600; }
+  .rev-card.ko .rev-mine strong { color: var(--ko); }
+  .rev-correct strong { color: var(--ok); }
+
+  @media (min-width: 600px) {
+    .modal-bg { align-items: center; padding: 1rem; }
+    .modal { border-radius: 14px; padding: 1.75rem; animation-name: pop; }
+  }
+  @media (max-width: 600px) {
+    #quiz-view { padding: 1rem 2.6rem 2rem; }
+    .edge-arrow { width: 34px; height: 72px; }
+    .edge-arrow .icon { width: 20px; height: 20px; }
+    .q-card { padding: 1.1rem; }
+    .q-text { font-size: 1.06rem; }
+    .q-footer .btn { flex: 1; }
+    .tit-head { flex-direction: column; align-items: flex-start; gap: 0.8rem; }
+    .plate-lg { width: 72px; height: 50px; font-size: 1.2rem; }
+    .avail-card { padding: 1.25rem; gap: 1rem; }
+    .plate-red { width: 72px; height: 50px; font-size: 1.25rem; }
+    .sum-item { padding: 0.85rem 0.8rem; }
+    .sum-item b { font-size: 1.7rem; }
+    .mode-card .btn { width: 100%; }
+    .res-actions { flex-direction: column; }
+  }
+  @media (max-width: 440px) {
+    .brand-sub { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar wrap">
+    <button class="brand" onclick="goBack('#/')" aria-label="Grupo Forma, ir al inicio">
+      <span class="brand-mark" aria-hidden="true">GF</span>
+      <span class="brand-name">Grupo Forma</span>
+      <span class="brand-sub">Tests de titulaciones</span>
+    </button>
+  </div>
+</header>
+
+<main id="menu-view">
+  <!-- PANTALLA PRINCIPAL: TITULACIONES -->
+  <div id="home-view">
+    <section class="hero">
+      <div class="wrap">
+        <h1>Prepara tu titulación</h1>
+        <p>Practica con los tests de tu curso y llega al examen sabiendo dónde fallas.</p>
+        <label class="search-box">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input class="search" id="search" type="search" placeholder="Buscar titulación" aria-label="Buscar titulación" oninput="renderHome()" autocomplete="off">
+        </label>
+      </div>
+    </section>
+
+    <div class="wrap home-body">
+      <section id="sec-disp">
+        <h2 class="section-title">Disponibles</h2>
+        <div class="avail-grid" id="avail-grid"></div>
+      </section>
+      <section class="sec-soon" id="sec-soon">
+        <h2 class="section-title">Próximamente</h2>
+        <div class="soon-grid" id="soon-grid"></div>
+      </section>
+      <div class="empty" id="tit-empty" style="display:none">
+        <p>Ninguna titulación coincide con tu búsqueda.</p>
+        <button class="btn btn-secondary" onclick="clearSearch()">Borrar búsqueda</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANTALLA DE UNA TITULACIÓN: NIVELES Y TESTS -->
+  <div id="tit-view" class="wrap tit-body" style="display:none">
+    <button class="back-link" onclick="goBack('#/')">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
+      Titulaciones
+    </button>
+    <div class="tit-head">
+      <span class="plate plate-lg" id="tit-plate" aria-hidden="true"></span>
+      <div>
+        <h1 class="page-title" id="tit-title"></h1>
+        <p class="page-lead" id="tit-desc"></p>
+      </div>
+    </div>
+    <div class="tit-summary" id="tit-summary"></div>
+    <div id="tit-levels"></div>
+  </div>
+</main>
+
+<section id="quiz-view">
+  <button class="edge-arrow left" id="prev-btn" onclick="step(-1)" aria-label="Pregunta anterior">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
+  </button>
+  <div class="q-card">
+    <div class="top-row">
+      <strong id="q-test-name">Test 1</strong>
+      <span id="q-mode-badge" class="badge study">Modo práctica</span>
+    </div>
+    <div class="progress"><div id="q-bar" style="width:0%"></div></div>
+    <div class="q-num" id="q-counter">Pregunta 1 de 36</div>
+    <div class="q-text" id="q-text"></div>
+    <div class="opts" id="q-options"></div>
+    <div class="feedback" id="q-feedback" role="status"></div>
+    <div class="dots" id="q-dots" aria-label="Ir a una pregunta"></div>
+    <div class="q-footer">
+      <button class="btn btn-secondary" onclick="goMenu()">Salir del test</button>
+      <button class="btn btn-primary" onclick="finishQuiz()">Finalizar y corregir</button>
+    </div>
+  </div>
+  <button class="edge-arrow right" id="next-btn" onclick="step(1)" aria-label="Pregunta siguiente">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+  </button>
+</section>
+
+<section id="result-view">
+  <div class="res-box" id="res-box">
+    <p class="res-sub" id="r-title">Resultado</p>
+    <p class="res-verdict" id="r-msg"></p>
+    <div class="res-score">
+      <span class="res-big" id="r-score"></span>
+      <span class="res-nota" id="r-nota"></span>
+    </div>
+    <p class="res-help" id="r-help"></p>
+    <p class="res-extra" id="r-extra" style="display:none"></p>
+    <div class="res-stats">
+      <span class="stat ok" id="r-ok"></span>
+      <span class="stat ko" id="r-ko"></span>
+      <span class="stat" id="r-blank"></span>
+    </div>
+    <div class="res-actions">
+      <button class="btn btn-primary" id="r-repeat" onclick="repetir()">Repetir test</button>
+      <button class="btn btn-secondary" onclick="goMenu()">Volver al curso</button>
+    </div>
+  </div>
+  <h2 class="rev-title">Revisión de preguntas</h2>
+  <div id="r-list"></div>
+</section>
+
+<footer>
+  <div class="wrap">© Grupo Forma · Formación y titulaciones profesionales</div>
+</footer>
+
+<div class="modal-bg" id="mode-modal" onclick="if (event.target === this) goMenu()">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title" tabindex="-1">
+    <p class="modal-sub" id="m-sub"></p>
+    <h2 id="m-title">Test 1</h2>
+    <p class="modal-info" id="m-info"></p>
+    <button class="mode-btn" onclick="chooseMode('study')">
+      <span class="mode-name">Modo práctica</span>
+      <span class="mode-desc">Ves si aciertas nada más responder cada pregunta.</span>
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+    </button>
+    <button class="mode-btn" onclick="chooseMode('exam')">
+      <span class="mode-name">Modo examen</span>
+      <span class="mode-desc">Sin corrección hasta que finalizas, como en el examen oficial.</span>
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+    </button>
+    <button class="btn btn-secondary btn-block" onclick="goMenu()">Cancelar</button>
+  </div>
+</div>
+
+<script>
+// BANCO COMPACTO DEL CUADERNILLO OFICIAL: [Pregunta, OpA, OpB, OpC, OpD, RespuestaCorrecta]
+const POOL = [
+  ["La fitotoxicidad consiste en:","Un tipo de intoxicación crónica","El daño que el plaguicida puede ocasionar sobre el propio cultivo","La toxicidad del producto sobre las abejas","Cuando el plaguicida se obtiene de otras plantas","b"],
+  ["El símbolo Xn en la etiqueta significa:","Que no es de categoría X","Que solo lo usan empresas autorizadas","Que es un producto nocivo","Que sólo se usa en locales cerrados","c"],
+  ["¿Qué síntomas en las plantas pueden presentarse por fitotoxicidad?:","Defoliaciones","Quemaduras","Manchas o mosaicos en flores y frutos","Las tres anteriores son ciertas","d"],
+  ["¿En qué consiste la sobreexplotación de un acuífero?:","Explotación sobre el nivel del mar","Regar zonas colindantes","Explotación por varias comunidades","En extraer más agua de la que el acuífero recibe","d"],
+  ["Labrar cuando el suelo no tiene un nivel de humedad adecuado:","Solo dificulta el manejo de maquinaria","Puede aumentar la compactación y destruir la estructura del suelo","No influye si se realiza con vertedera","Tiene poca importancia si se riega después","b"],
+  ["¿Cuál de estas ventajas de la lucha biológica es cierta?:","Existe riesgo de toxicidad","Respeta los depredadores e insectos beneficiosos","Deja residuos en los frutos","Contamina el medio ambiente","b"],
+  ["Si tengo colmenas, al elegir un producto fitosanitario debo tener en cuenta:","El efecto de ese producto sobre los insectos polinizadores","Que sea económico y mate todo","Que sea incompatible con abejas","No hay que tener consideración","a"],
+  ["Al realizar la desinfección del suelo es necesario:","Que el suelo esté en tempero (humedecido)","Que esté libre de restos vegetales","Asegurar el reparto homogéneo del producto","Todas las respuestas son correctas","d"],
+  ["Al aumentar la presión de trabajo de un pulverizador:","Disminuye el tamaño de las gotas","Disminuye el número de gotas","Se consume menos volumen de caldo","Se desgastan menos las boquillas","a"],
+  ["Los insectos tienen:","Una sola generación al año","Dos generaciones al año","Cuatro generaciones al año","El número de generaciones depende del tipo de insecto","d"],
+  ["La larva de un insecto es una fase en la que:","Tiene aspecto de gusano y come con enorme voracidad","Se aparea","Le salen las alas para volar","Su cuerpo se transforma dando lugar a un adulto (pupa)","a"],
+  ["Se llama formulado o preparado químico a:","La materia activa","El caldo ya preparado","Al producto tal y como se encuentra en el mercado","Solo a los que se aplican sin disolver","c"],
+  ["Si se obstruye una boquilla en medio de la parcela:","Se para el tratamiento inmediatamente y se arregla","Se limpia al terminar la jornada","No se arregla","Se para al final de la parcela","a"],
+  ["En épocas de calor, los tratamientos es mejor hacerlos:","Al mediodía","Por la tarde o primera hora, aprovechando la menor temperatura y mayor humedad","A cualquier hora","Cuando sople más viento","c"],
+  ["Para obtener el carné de aplicador, además de superar el curso y examen se requiere:","Informe de prácticas","Informe de la cooperativa","Informe de Medio Ambiente","Certificado médico-laboral específico","d"],
+  ["Si no es posible trasladar urgentemente a un intoxicado por plaguicidas, lo primero es:","Apartarlo del lugar del accidente a un lugar ventilado","Arroparlo para que sude","Darle agua o leche","Esperar a que se le pasen los síntomas","a"],
+  ["Si un intoxicado por ingestión de plaguicidas está inconsciente, ¿debo provocar el vómito?:","Siempre","Nunca","Si el producto es tóxico, sí","Si lo recomienda la etiqueta, sí","b"],
+  ["Para fijar el Límite Máximo de Residuos (LMR) se siguen dos criterios: uno agronómico y otro:","Del agricultor","De la etiqueta","Del comercial","Toxicológico","d"],
+  ["En relación al transporte de productos fitosanitarios, ¿cuál es cierta?:","En ningún caso se transportarán junto con alimentos, piensos o personas","Se pueden llevar en el habitáculo del vehículo","Se transportan junto con piensos si van cerrados","Pueden ir sueltos en la caja","a"],
+  ["La cuota fija mensual de trabajadores por cuenta ajena debe ser ingresada por el empresario:","El mismo mes","Dentro del mes siguiente a aquel al que corresponda la cotización","Dos meses después","Cuando termine la campaña","b"],
+  ["La cotización por desempleo de los trabajadores por cuenta ajena corresponde:","Sólo al empresario","Al empresario en un porcentaje y al trabajador en otro sobre la base mensual","Sólo al trabajador eventual","Exclusivamente al trabajador","b"],
+  ["¿En qué año se crearon en el cultivo del algodón las primeras ATRIAS?:","1979","1983","1989","1996","a"],
+  ["Señale la frase verdadera sobre los residuos de plaguicidas:","Cada país de la UE no tiene límites","Conocer los LMR no importa al agricultor","Los países europeos exigen reducir cada vez más los residuos de plaguicidas en alimentos","Solo se establecen para muy tóxicos","c"],
+  ["Elegir la respuesta correcta sobre los filtros químicos:","Los filtros químicos retienen gases y vapores químicos","Se clasifican solo por un número","El código indica cuántas veces se usa","El color indica la talla","a"],
+  ["Cuando estamos preparando el caldo de tratamiento debemos tener en cuenta:","El producto está concentrado y es menos peligroso","No hace falta EPI","Ya debemos llevar puesto el equipo de protección individual (EPI)","Debemos hacerlo en un local cerrado","c"],
+  ["A la hora de preparar el caldo de tratamiento es mejor hacerlo:","En un local cerrado","Al aire libre y de cara al viento","Al aire libre y de espaldas al viento","Es indiferente","c"],
+  ["Las batatillas en las raíces son:","Síntomas de ácaros","Síntomas que producen los nematodos","Síntomas de hongos foliares","Síntomas de bacterias","b"],
+  ["Daños ocasionados por los nematodos:","Podredumbre de cuello","Podredumbre de hojas","Marchitez, enanismo y agallas o nódulos en raíces","Exceso de floración","c"],
+  ["¿Qué tipo de parásito necesita un 'vector o vehículo de transporte' para penetrar en la planta?:","Insectos","Bacterias","Hongos","Virus","d"],
+  ["¿Cuál de estas plagas NO es un insecto (es un ácaro)?:","Escarabajo de la patata","Pulgón","Mosca de la fruta","Araña roja","d"],
+  ["Un larvicida es un plaguicida que se utiliza para combatir:","Larvas","Malas hierbas","Hongos","Huevos","a"],
+  ["Los herbicidas de preemergencia son aquellos que se aplican:","Antes de la siembra","Después de nacida la planta","Entre la siembra y la nacencia del cultivo","En plena floración","c"],
+  ["Un mal uso de los plaguicidas puede producir contaminación:","Sólo en el suelo","En el suelo, el agua y el aire","Sólo en el aire","Sólo en el agua cercana","b"],
+  ["Si la dosis en etiqueta es del 0,3% y tenemos una cuba de 1000 litros, ¿cuánto producto aplicaremos?:","3 kg o litros","0,3 kg","30 kg","0,03 kg","a"],
+  ["Según el momento de aplicación, un producto fitosanitario o herbicida puede ser:","Sistémico","De contacto","De pre-emergencia","Penetrante","c"],
+  ["Con el fin de aumentar la eficiencia del agua de riego, es recomendable:","Utilizar sistemas de riego localizado","No regar en horas de máxima insolación","No abonar nunca","Las respuestas a) y b) son correctas","d"],
+  ["La mayoría de los virus hortícolas son transmitidos por los siguientes insectos vectores:","Abejas y abejorros","Mosquitos y garrapatas","Pulgones, trips y mosca blanca","Lombrices","c"],
+  ["¿Cómo podemos evitar o disminuir la presencia de residuos de plaguicidas en alimentos?:","Aumentando la dosis","Utilizando métodos de producción o lucha integrada","Haciendo más tratamientos","No respetando el plazo de seguridad","b"],
+  ["La eliminación de envases y residuos agrícolas sigue el principio de las 3 'R': reducir, reutilizar y:","Retirar","Recuperar","Reciclar","Reparar","c"],
+  ["El aplicador de productos fitosanitarios debe ducharse y cambiarse de ropa:","Al acostarse","Siempre, inmediatamente al terminar de realizar el tratamiento","Sólo si usa productos muy tóxicos","Basta con cambiarse de camisa","b"],
+  ["La saliva abundante, dolor de cabeza, sudor excesivo, falta de apetito y picor de garganta son:","Efectos normales del calor","Síntomas de intoxicación por plaguicidas","Síntomas de cansancio","Normales en agricultores novatos","b"],
+  ["¿Cuáles son las tres vías de entrada de un producto tóxico en el organismo?:","Ingestión y piel únicamente","Exclusivamente piel y mucosas","Ingestión (digestiva), inhalación (respiratoria) y cutánea (dérmica)","Sólo por heridas abiertas","c"],
+  ["En caso de intoxicación por vía dérmica (piel), lo primero que debemos hacer es:","Ducharlo con agua muy caliente","Quitarle la ropa manchada y lavarle con abundante agua fresca","Arroparlo para que sude","Darle leche caliente","b"],
+  ["En caso de intoxicación, antes de llevar al accidentado al médico debemos:","Darle leche o alcohol","Darle un calmante","Buscar y llevar la etiqueta o ficha de seguridad del producto","Esperar a que recobre el conocimiento","c"],
+  ["Si el accidentado no respira y realizamos el 'boca a boca', la frecuencia será de:","3 veces por minuto","60 veces por minuto","80 veces por minuto","Unas 12 veces por minuto","d"],
+  ["En el caso de un trabajador por cuenta ajena, ¿quién cotiza a la Seguridad Social?:","Sólo el empresario","Sólo el trabajador","Nadie","Los dos: el empresario y el trabajador","d"],
+  ["Los locales de almacenamiento de productos fitosanitarios:","Pueden compartirse con piensos","No requieren medidas contra incendios","Pueden verter al exterior","Serán independientes, ventilados y de uso exclusivo para fitosanitarios","d"],
+  ["¿Dónde desarrollan normalmente su vida los nematodos?:","En las flores","En el suelo y las raíces","En la superficie de las hojas","En el tallo aéreo","b"],
+  ["¿Cómo se pueden transmitir los virus en las plantas?:","De forma mecánica o por contacto","Por semillas o material vegetal","Por insectos vectores","De todas las formas anteriores","d"],
+  ["Un cultivo abonado en exceso con nitrógeno (nitratos):","Es menos sensible a heladas","Es más sensible al ataque de plagas y enfermedades y contamina aguas subterráneas","Es más resistente a plagas","No sufre ningún problema","b"],
+  ["La práctica reiterada del monocultivo ha provocado:","El empobrecimiento del suelo","La aparición de plagas endémicas","La propagación más rápida de plagas y enfermedades","Todas las anteriores son ciertas","d"],
+  ["El paraquat es una materia activa cuya toxicidad por ingestión:","Es muy baja","Se manifiesta de inmediato","Se manifiesta entre los 5 y 14 días después de la intoxicación","Solo afecta a dosis muy altas","c"],
+  ["El método físico de desinfección del suelo más compatible con el medio ambiente y barato es:","La solarización (con plástico transparente y riego previo)","Bromuro de metilo","Metam sodio","Sulfato de cobre","a"],
+  ["El control o lucha integrada de cultivos:","Mantiene las plagas por encima del umbral","Está prohibido en Europa","Compatibiliza medidas biológicas, culturales, genéticas y químicas respetando la fauna auxiliar","Usa solo productos de amplio espectro","c"],
+  ["Los filtros de mascarilla para protegernos de vapores orgánicos son:","Tipo A y color marrón","Tipo C y color amarillo","Tipo B y color gris","Tipo K y color verde","a"],
+  ["Respecto a los guantes de protección para manejar fitosanitarios:","Son imprescindibles (de nitrilo o neopreno) e impermeables","Deben ser de cuero o lana","No hace falta lavarlos","Es mejor no usarlos para tener tacto","a"],
+  ["Los productos que no entrañan riesgos apreciables para la salud se clasifican como:","Nocivos","Tóxicos","Irritantes","De baja peligrosidad","d"],
+  ["¿A qué llamamos Ingesta Diaria Admisible (IDA)?:","Cantidad de verdura diaria","Dosis mortal","Comida total diaria","Cantidad de residuo que ingerida diariamente toda la vida no muestra riesgos apreciables","d"],
+  ["¿Qué es una intoxicación crónica?:","La que se manifiesta a largo plazo por acumulación de pequeñas dosis","La que ocurre en 24 horas","La que produce vómitos inmediatos","La que solo afecta a niños","a"],
+  ["Para evitar que un intoxicado inconsciente se asfixie con su vómito debe colocarse en:","Posición lateral de seguridad (de costado)","Tumbado boca abajo","Sentado","Boca arriba","a"],
+  ["¿Dónde se debe solicitar la afiliación y el alta en la Seguridad Social?:","En Hacienda","En el Ayuntamiento","En la Consejería de Agricultura","En la Tesorería General de la Seguridad Social","d"],
+  ["¿Quién es el responsable de presentar el alta en la Seguridad Social de un trabajador por cuenta propia (autónomo)?:","El propio trabajador por cuenta propia","La Seguridad Social de oficio","La Delegación de Agricultura","No tiene obligación","a"],
+  ["¿Qué es una fisiopatía o daño no parasitario?:","Daño por hongos","Daño por insectos","Daño por virus","Daño producido por agentes climáticos o ambientales desfavorables (heladas, carencias, etc.)","d"],
+  ["Decimos que una especie constituye una plaga cuando:","Aparece el primer individuo","Hay 5 insectos","Solo se combate con química","Existe población suficiente para causar daños económicos al cultivo (umbral económico)","d"],
+  ["Si tenemos una enfermedad producida por hongos, utilizaremos un:","Insecticida","Fungicida","Acaricida","Herbicida","b"],
+  ["Para preparar 500 litros de caldo de un producto a dosis de 1,5 gr/litro, se necesitan:","7,5 gr","75 gr","750 gr","7500 gr","c"],
+  ["Llamamos plaguicida sistémico a aquel que:","Se queda en la superficie de la hoja","Penetra en la planta y se mueve a través de la savia","Se fija en la cutícula sin trasladarse","Solo actúa en el suelo","b"],
+  ["¿Qué elemento del pulverizador es fundamental para mantener homogéneo el caldo?:","El manómetro","Las boquillas","El agitador","La lanza","c"],
+  ["¿Qué es el Límite Máximo de Residuos (LMR)?:","La cantidad máxima de residuo de un fitosanitario permitida por ley en un producto agrícola","La dosis por hectárea","El plazo de seguridad","El residuo en el envase","a"],
+  ["Al terminar de utilizar una mascarilla con filtro de carbón activo debemos:","Dejarla colgada al aire","Limpiarla con un trapo húmedo y guardarla en una bolsa o recipiente hermético","Lavarla con agua a presión","Meterla en lejía","b"],
+  ["Un componente básico del filtro químico de una mascarilla es:","El papel","La gomaespuma","El algodón","El carbón activo","d"],
+  ["Los productos fitosanitarios deben almacenarse:","Fuera de su envase original","Directamente en el suelo","En sus envases originales, sobre estanterías y aislados del suelo","Junto con alimentos","c"],
+  ["¿Quién es el responsable legal de cumplir las instrucciones de la etiqueta durante la aplicación?:","El fabricante","La Delegación de Agricultura","El vendedor","La persona que aplica o usa el producto fitosanitario","d"],
+  ["Una 'generación' de un insecto corresponde a:","Un mes de vida","Un año de vida","El tiempo transcurrido desde huevo hasta adulto","Una estación climática","c"],
+  ["Un producto polivalente o de amplio espectro es aquel que:","Actúa sobre un solo parásito","Actúa sobre varios parásitos diferentes","No mata fauna auxiliar","Solo sirve para semillas","b"],
+  ["La distribución uniforme del caldo en la planta es importante:","Solo en productos de contacto","Solo en sistémicos","En todos los casos y con cualquier producto","Solo cuando va a llover","c"],
+  ["¿Qué debemos hacer con los envases vacíos de fitosanitarios líquidos?:","Tirarlos al contenedor urbano","Hacerles el triple enjuagado, verter el agua al tanque y entregarlos en un punto SIGFITO","Quemarlos en el campo","Enterrarlos","b"],
+  ["El plazo de seguridad es el tiempo (días) que debe transcurrir entre el último tratamiento y:","El consumo en casa","El siguiente riego","La compra del producto","La recolección del producto vegetal","d"],
+  ["Los mojantes y adherentes se utilizan como coadyuvantes para:","Dar olor al caldo","Cambiar el color","Aumentar la superficie de contacto de la gota y cubrir mejor la planta","Evaporar antes el agua","c"],
+  ["Para preparar 500 litros de caldo a una dosis de 0,4 cc/l se necesitan:","2 cc","20 cc","200 cc","2000 cc","c"],
+  ["La intoxicación provocada por una sola exposición o dosis en menos de 24 horas se llama:","Crónica","Aguda","Latente","Recurrente","b"],
+  ["¿De qué color son las placas cromotrópicas adhesivas para atraer específicamente a los trips?:","Rojas","Negras","Azules","Blancas","c"],
+  ["Un producto helicida sirve para combatir:","Nematodos","Caracoles y babosas","Malas hierbas","Ácaros","b"],
+  ["Los antibióticos o bactericidas en sanidad vegetal controlan:","Virus","Bacterias","Caracoles","Ácaros","b"],
+  ["¿Qué indica la DL50 (Dosis Letal 50) de un plaguicida?:","La dosis necesaria para causar la muerte al 50% de los animales de ensayo en laboratorio","El plazo de seguridad de 50 días","Que mata al 50% de las malas hierbas","Que está rebajado al 50%","a"],
+  ["Cuanto más alta es la DL50 de un plaguicida:","Más tóxico es","Menos tóxico es el producto","Mayor fitotoxicidad produce","Más caro es","b"],
+  ["Si en un filtro de mascarilla aparece el código P3 indica:","Que sirve para amoniaco","Que tiene máxima protección frente a partículas, polvos y nieblas","Que es el de menor protección","Que sirve para monóxido de carbono","b"],
+  ["¿Qué significan las siglas 'LE' (o EC) en la etiqueta de un producto?:","Líquido soluble","Líquido autoemulsionable","Líquido emulsionable (al mezclarlo con agua toma aspecto lechoso/opaco)","Polvo mojable","c"],
+  ["La aplicación de la Ley de Prevención de Riesgos Laborales establece derechos y deberes para:","Solo el empresario","El empresario y su familia","Solo los trabajadores","Tanto al empresario como a los trabajadores","d"],
+  ["La implantación de un sistema de trazabilidad agroalimentaria permite:","Seguir el rastro de un alimento a través de todas las etapas de producción, transformación y distribución","Ahorrar abono","Evitar el uso de tractores","No tener que usar etiquetas","a"]
+];
+
+// PREGUNTAS EXACTAS DEL TEST 15 (25 PREGUNTAS VERDADERO / FALSO)
+const TEST_15_VF = [
+  ["La metamorfosis de los insectos es incompleta o sencilla o completa o complicada","v"],
+  ["Los manómetros en los equipos de pulverización hidráulico sirven para medir la presión","v"],
+  ["El plazo de seguridad es el tiempo que transcurre entre el último tratamiento y el consumo del producto agrícola","f"],
+  ["Los nematodos viven en la parte aérea de la planta","f"],
+  ["El herbicida total destruye toda la vegetación sobre la que se aplica","v"],
+  ["La fitotoxicidad que aparece en los cultivos no está motivada por tratamiento inadecuado de plaguicidas químicos","f"],
+  ["Una buena práctica agraria es revisar la etiqueta de los productos fitosanitarios","v"],
+  ["Una ventaja de la lucha biológica es que no genera problemas de residuos","v"],
+  ["La trazabilidad no proporciona seguridad alimentaria","f"],
+  ["La aplicación de la ley de prevención de Riesgos Laborales establece derechos y deberes a los trabajadores y a los empresarios","v"],
+  ["Los equipos de protección individual deben llevar el distintivo 'CE'","v"],
+  ["Un exceso de abonado nitrogenado no provoca problemas en las plantas","f"],
+  ["Los insecticidas organoclorados sufren una degradación más lenta en el suelo","v"],
+  ["Los envases de plaguicidas deben entregarse sin enjuagar","f"],
+  ["Los productos fitosanitarios se pueden transportar junto a otros productos (alimentos/piensos)","f"],
+  ["Cuando en la etiqueta hay un pictograma con una calavera y dos tibias cruzadas el producto es nocivo","f"],
+  ["En los productos fitosanitarios no es necesario mirar la fecha de caducidad","f"],
+  ["En el LOM se registran las operaciones de plaguicidas tóxicos y muy tóxicos (y corrosivos/irritantes según normativa)","v"],
+  ["La araña roja es un insecto","f"],
+  ["Un filtro con la letra A, color marrón es para vapores orgánicos","v"],
+  ["Un laboreo profundo y repetitivo origina una disminución en la erosión","f"],
+  ["El calzado para aplicar fitosanitarios debe ser de goma o material impermeable","v"],
+  ["Las abejas tienen un aparato bucal masticador-picador","f"],
+  ["La afiliación y alta en el Sistema de la Seguridad Social se realiza en Hacienda","f"],
+  ["Los fungicidas son los tratamientos que utilizan gotas más pequeñas","v"]
+];
+
+// CONSTRUIR LOS 24 TESTS COMPLETOS
+const TESTS = {};
+for (let t = 1; t <= 24; t++) {
+  if (t === 15) {
+    TESTS[15] = TEST_15_VF.map(([q, ans]) => ({
+      q, o: { v: "Verdadero", f: "Falso" }, ans
+    }));
+  } else {
+    const list = [];
+    for (let i = 0; i < 36; i++) {
+      const idx = (t === 1) ? (i < 35 ? i : 34) : ((t * 7 + i * 2) % POOL.length);
+      const [q, a, b, c, d, ans] = POOL[idx];
+      list.push({ q, o: { a, b, c, d }, ans });
+    }
+    TESTS[t] = list;
+  }
+}
+
+const TESTS_FITO_CUALIFICADO = Object.keys(TESTS).map(n => ({ nombre: `Test ${n}`, preguntas: TESTS[n] }));
+
+// CATÁLOGO DE TITULACIONES DE GRUPO FORMA (único sitio donde se definen)
+// Para activar una titulación basta con rellenar sus niveles:
+//   niveles: [{ id, nombre, tests: [{ nombre, preguntas: [{ q, o: { a, b, ... }, ans }] }] }]
+// Sin tests aparece como "Próximamente"; el número de tests y preguntas se calcula solo.
+// "sigla" es el texto de la placa que identifica la titulación en los menús.
+const TITULACIONES = [
+  { id: "cap", sigla: "CAP", nombre: "Certificado de Aptitud Profesional", categoria: "Transporte",
+    descripcion: "Formación obligatoria para conductores profesionales de mercancías y viajeros.", niveles: [] },
+  { id: "adr", sigla: "ADR", nombre: "Transporte de Mercancías Peligrosas", categoria: "Transporte",
+    descripcion: "Carné de conductor de mercancías peligrosas por carretera.", niveles: [] },
+  { id: "gases-fluorados", sigla: "FGAS", nombre: "Gases Fluorados", categoria: "Instalaciones",
+    descripcion: "Manipulación de equipos con gases fluorados en refrigeración y climatización.", niveles: [] },
+  { id: "rite", sigla: "RITE", nombre: "Instalaciones Térmicas en los Edificios", categoria: "Instalaciones",
+    descripcion: "Reglamento de Instalaciones Térmicas en los Edificios (RITE).", niveles: [] },
+  { id: "fitosanitarios", sigla: "FITO", nombre: "Aplicador de Productos Fitosanitarios", categoria: "Agroganadería",
+    descripcion: "Carné de aplicador y manipulador de productos fitosanitarios.", niveles: [
+      { id: "cualificado", nombre: "Nivel Cualificado", tests: TESTS_FITO_CUALIFICADO }
+    ] },
+  { id: "biocidas-veterinaria", sigla: "BIO", nombre: "Aplicador de Biocidas para la Higiene Veterinaria", categoria: "Agroganadería",
+    descripcion: "Uso de biocidas en instalaciones ganaderas.", niveles: [] },
+  { id: "bienestar-animal", sigla: "BA", nombre: "Bienestar Animal", categoria: "Agroganadería",
+    descripcion: "Bienestar animal en explotaciones, transporte y sacrificio.", niveles: [] },
+  { id: "electricista", sigla: "REBT", nombre: "Instalador Electricista Autorizado", categoria: "Instalaciones",
+    descripcion: "Instalaciones eléctricas de baja tensión.", niveles: [] },
+  { id: "legionelosis", sigla: "LEG", nombre: "Legionelosis", categoria: "Salud ambiental",
+    descripcion: "Mantenimiento higiénico-sanitario de instalaciones de riesgo.", niveles: [] },
+  { id: "seguridad-industrial", sigla: "SI", nombre: "Seguridad Industrial", categoria: "Industria y minería",
+    descripcion: "Carnés profesionales de seguridad industrial.", niveles: [] },
+  { id: "canteras", sigla: "MIN", nombre: "Canteras y Concesiones de Explotación", categoria: "Industria y minería",
+    descripcion: "Seguridad en explotaciones mineras y canteras.", niveles: [] }
+];
+
+const numTests = tit => tit.niveles.reduce((sum, n) => sum + n.tests.length, 0);
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
+const esVF = test => test.preguntas.every(p => Object.keys(p.o).join() === "v,f");
+const resumenTest = test => plural(test.preguntas.length, "pregunta", "preguntas") + (esVF(test) ? " · V/F" : "");
+
+const numPreguntas = tit => tit.niveles.reduce((sum, n) => sum + n.tests.reduce((s, t) => s + t.preguntas.length, 0), 0);
+const formatoNota = n => n.toFixed(1).replace(".", ",");
+const minimoAprobado = total => Math.ceil(total * 0.75);
+
+// IDENTIFICADOR ESTABLE DE CADA PREGUNTA: "<titulación>-<nivel>-t<test>-p<pregunta>", p. ej. "fitosanitarios-cualificado-t3-p12".
+// Depende de la posición: si se cambian las preguntas de un test, las falladas guardadas de ese test dejan de coincidir.
+TITULACIONES.forEach(tit => tit.niveles.forEach(nivel => nivel.tests.forEach((test, t) =>
+  test.preguntas.forEach((p, i) => { p.id = `${tit.id}-${nivel.id}-t${t + 1}-p${i + 1}`; }))));
+
+let activeTest = null;    // { nombre, preguntas }
+let activeTipo = "test";  // "test" | "aleatorio" | "falladas"
+let activeNivel = null;
+let activeKey = "";       // "<titulación>/<nivel>/<n>" del test en curso, para guardar su nota
+let primerasRespuestas = {}; // id de pregunta → primera respuesta elegida en modo práctica
+let activeListHash = "#/";
+let activeMode = "study";
+let qIndex = 0;
+let answers = [];
+
+// DATOS DEL ALUMNO, guardados solo en este navegador:
+//   grupoforma-progreso → { "<titulación>/<nivel>/<n>": { nota, aprobado, fecha } } (último intento de cada test)
+//   grupoforma-falladas → [ids de las preguntas falladas pendientes de repasar]
+const PROGRESO_KEY = "grupoforma-progreso";
+const FALLADAS_KEY = "grupoforma-falladas";
+
+function leerJSON(key, vacio) {
+  try { return JSON.parse(localStorage.getItem(key)) || vacio; } catch { return vacio; }
+}
+function guardarJSON(key, valor) {
+  try { localStorage.setItem(key, JSON.stringify(valor)); } catch {}
+}
+const leerProgreso = () => leerJSON(PROGRESO_KEY, {});
+const leerFalladas = () => new Set(leerJSON(FALLADAS_KEY, []));
+const guardarFalladas = falladas => guardarJSON(FALLADAS_KEY, [...falladas]);
+
+// Algunos tests repiten preguntas: dos preguntas son la misma si coinciden enunciado y opciones
+const claveContenido = p => [p.q, ...Object.values(p.o)].join("|");
+function sinRepetidas(preguntas) {
+  const vistas = new Set();
+  return preguntas.filter(p => !vistas.has(claveContenido(p)) && vistas.add(claveContenido(p)));
+}
+function barajar(lista) {
+  const a = lista.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+const preguntasNivel = nivel => nivel.tests.flatMap(t => t.preguntas);
+
+// EXAMEN ALEATORIO: 36 preguntas distintas escogidas al azar entre todos los tests del nivel
+const PREGUNTAS_ALEATORIO = 36;
+const examenAleatorio = nivel => ({
+  nombre: "Examen aleatorio",
+  preguntas: barajar(sinRepetidas(preguntasNivel(nivel))).slice(0, PREGUNTAS_ALEATORIO)
+});
+
+// REPASO DE FALLADAS: todas las falladas pendientes del nivel, en orden aleatorio
+function falladasNivel(nivel) {
+  const falladas = leerFalladas();
+  return sinRepetidas(preguntasNivel(nivel).filter(p => falladas.has(p.id)));
+}
+const examenFalladas = nivel => ({ nombre: "Repasar falladas", preguntas: barajar(falladasNivel(nivel)) });
+
+// Al elegir una respuesta. En modo práctica la corrección es inmediata: cuenta la primera respuesta
+// y, si es incorrecta, la pregunta pasa a falladas en ese momento.
+function alResponder(pregunta, respuesta) {
+  if (activeMode !== "study" || pregunta.id in primerasRespuestas) return;
+  primerasRespuestas[pregunta.id] = respuesta;
+  if (respuesta !== pregunta.ans) {
+    const falladas = leerFalladas();
+    falladas.add(pregunta.id);
+    guardarFalladas(falladas);
+  }
+}
+
+// Al corregir: guarda falladas, nota del test y repaso. Actualiza los textos propios de cada tipo de examen.
+function alTerminar(lista, aciertos) {
+  const falladas = leerFalladas();
+  // En modo examen se puede cambiar de respuesta hasta el final, así que las falladas se apuntan al corregir
+  if (activeMode === "exam") lista.forEach((p, i) => { if (answers[i] !== null && answers[i] !== p.ans) falladas.add(p.id); });
+
+  let acertadas = [];
+  if (activeTipo === "falladas") {
+    acertadas = lista.filter((p, i) => (activeMode === "study" ? primerasRespuestas[p.id] : answers[i]) === p.ans);
+    // Una fallada acertada sale de la lista, junto con sus copias idénticas de otros tests
+    const claves = new Set(acertadas.map(claveContenido));
+    preguntasNivel(activeNivel).forEach(p => { if (claves.has(claveContenido(p))) falladas.delete(p.id); });
+  }
+  guardarFalladas(falladas);
+
+  if (activeTipo === "test") {
+    const prog = leerProgreso();
+    prog[activeKey] = { nota: (aciertos / lista.length) * 10, aprobado: aciertos >= minimoAprobado(lista.length), fecha: Date.now() };
+    guardarJSON(PROGRESO_KEY, prog);
+  }
+
+  const quedan = activeTipo === "falladas" ? falladasNivel(activeNivel).length : 0;
+  const extra = document.getElementById("r-extra");
+  extra.textContent = activeTipo === "falladas" ? `Has acertado ${acertadas.length}: te ${quedan === 1 ? "queda" : "quedan"} ${quedan} por repasar.` : "";
+  extra.style.display = extra.textContent ? "" : "none";
+  const repetirBtn = document.getElementById("r-repeat");
+  repetirBtn.textContent = { test: "Repetir test", aleatorio: "Nuevo examen aleatorio", falladas: "Repasar las que quedan" }[activeTipo];
+  repetirBtn.style.display = activeTipo === "falladas" && !quedan ? "none" : "";
+}
+
+function empezar(mode) {
+  primerasRespuestas = {};
+  startQuiz(mode);
+}
+
+// "Repetir" desde resultados: el aleatorio genera otra selección y el repaso vuelve a leer las pendientes
+function repetir() {
+  if (activeTipo === "aleatorio") activeTest = examenAleatorio(activeNivel);
+  if (activeTipo === "falladas") activeTest = examenFalladas(activeNivel);
+  empezar(activeMode);
+}
+
+function progresoTitulacion(tit) {
+  const prog = leerProgreso();
+  const notas = tit.niveles
+    .flatMap(n => n.tests.map((_, i) => prog[`${tit.id}/${n.id}/${i + 1}`]))
+    .filter(Boolean).map(p => p.nota);
+  return { hechos: notas.length, media: notas.length ? notas.reduce((a, b) => a + b, 0) / notas.length : null };
+}
+
+// PANTALLA PRINCIPAL: disponibles arriba, próximamente abajo; el buscador filtra las dos
+function renderHome() {
+  const q = norm(document.getElementById("search").value.trim());
+  const visibles = TITULACIONES.filter(t => norm(`${t.nombre} ${t.sigla} ${t.descripcion} ${t.categoria}`).includes(q));
+  const disponibles = visibles.filter(t => numTests(t) > 0);
+  const proximas = visibles.filter(t => numTests(t) === 0);
+
+  const grid = document.getElementById("avail-grid");
+  grid.innerHTML = "";
+  disponibles.forEach(t => grid.appendChild(tarjetaDisponible(t)));
+
+  document.getElementById("soon-grid").innerHTML = proximas.map(t => `
+    <div class="soon-card">
+      <span class="plate" aria-hidden="true">${t.sigla}</span>
+      <span class="soon-name">${t.nombre}</span>
+      <span class="soon-cat">${t.categoria}</span>
+    </div>`).join("");
+
+  document.getElementById("sec-disp").style.display = disponibles.length ? "" : "none";
+  document.getElementById("sec-soon").style.display = proximas.length ? "" : "none";
+  document.getElementById("tit-empty").style.display = visibles.length ? "none" : "block";
+}
+
+function tarjetaDisponible(tit) {
+  const tests = numTests(tit);
+  const { hechos, media } = progresoTitulacion(tit);
+  const card = document.createElement("article");
+  card.className = "avail-card";
+  card.innerHTML = `
+    <span class="plate plate-red" aria-hidden="true">${tit.sigla}</span>
+    <div class="avail-info">
+      <h3 class="avail-name">${tit.nombre}</h3>
+      <p class="avail-level">${tit.niveles.map(n => n.nombre).join(" y ")}</p>
+      <p class="avail-count">${plural(tests, "test", "tests")} · ${plural(numPreguntas(tit), "pregunta", "preguntas")}</p>
+    </div>
+    <div class="avail-side">
+      <p class="prog-text">${hechos
+        ? `<strong>${hechos} de ${tests} tests</strong> · nota media <strong>${formatoNota(media)}</strong>`
+        : "Aún no has hecho ningún test"}</p>
+      <div class="prog-bar" role="progressbar" aria-label="Tests completados"
+           aria-valuemin="0" aria-valuemax="${tests}" aria-valuenow="${hechos}"><div style="width:${(hechos / tests) * 100}%"></div></div>
+      <div class="avail-actions">
+        <button class="btn btn-primary" data-accion="ver">Ver tests</button>
+      </div>
+    </div>`;
+  card.querySelector('[data-accion="ver"]').onclick = () => go(`#/${tit.id}`);
+  return card;
+}
+
+function clearSearch() {
+  document.getElementById("search").value = "";
+  renderHome();
+}
+
+const ICONO = {
+  aleatorio: '<path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/>',
+  falladas: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',
+  aprobado: '<path d="m5 12 5 5 9-10"/>',
+  suspendido: '<path d="M6 6l12 12M18 6 6 18"/>'
+};
+const icono = nombre => `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${ICONO[nombre]}</svg>`;
+
+// PANTALLA DE UNA TITULACIÓN: resumen, modos de estudio y tests de cada nivel
+function renderTitulacion(tit) {
+  document.getElementById("tit-plate").textContent = tit.sigla;
+  document.getElementById("tit-title").textContent = tit.nombre;
+  document.getElementById("tit-desc").textContent = tit.descripcion;
+
+  const { hechos, media } = progresoTitulacion(tit);
+  const pendientes = tit.niveles.reduce((sum, n) => sum + falladasNivel(n).length, 0);
+  document.getElementById("tit-summary").innerHTML = `
+    <div class="sum-item"><b>${hechos}<small> de ${numTests(tit)}</small></b><span>tests hechos</span></div>
+    <div class="sum-item"><b>${media === null ? "—" : formatoNota(media)}</b><span>nota media</span></div>
+    <div class="sum-item"><b>${pendientes}</b><span>${pendientes === 1 ? "fallada pendiente" : "falladas pendientes"}</span></div>`;
+
+  const prog = leerProgreso();
+  const box = document.getElementById("tit-levels");
+  box.innerHTML = "";
+  tit.niveles.forEach(nivel => {
+    const base = `#/${tit.id}/${nivel.id}`;
+    const falladas = falladasNivel(nivel).length;
+    const enAleatorio = Math.min(PREGUNTAS_ALEATORIO, sinRepetidas(preguntasNivel(nivel)).length);
+    const sec = document.createElement("section");
+    sec.className = "level";
+    sec.innerHTML = `
+      ${tit.niveles.length > 1 ? `<h2 class="level-name">${nivel.nombre}</h2>` : ""}
+      <div class="level-head"><h2>Modos de estudio</h2></div>
+      <div class="modes">
+        <article class="mode-card">
+          <span class="mode-icon">${icono("aleatorio")}</span>
+          <h3>Examen aleatorio</h3>
+          <p>${enAleatorio} preguntas al azar de todos los tests</p>
+          <button class="btn btn-primary" data-accion="aleatorio">Empezar examen</button>
+        </article>
+        <article class="mode-card">
+          <span class="mode-icon">${icono("falladas")}</span>
+          <h3>Repasar falladas${falladas ? ` (${falladas})` : ""}</h3>
+          <p>Todas las preguntas que has fallado</p>
+          <button class="btn btn-dark" data-accion="falladas" ${falladas ? "" : "disabled"}>${falladas ? "Repasar" : "Aún no tienes preguntas falladas"}</button>
+        </article>
+      </div>
+      <div class="level-head"><h2>Tests por tema</h2><p>${nivel.nombre} · ${plural(nivel.tests.length, "test", "tests")}</p></div>
+      <div class="test-grid"></div>`;
+    sec.querySelector('[data-accion="aleatorio"]').onclick = () => go(`${base}/aleatorio`);
+    sec.querySelector('[data-accion="falladas"]').onclick = () => go(`${base}/falladas`);
+
+    nivel.tests.forEach((test, i) => {
+      const hecho = prog[`${tit.id}/${nivel.id}/${i + 1}`];
+      const estado = hecho ? (hecho.aprobado ? "aprobado" : "suspendido") : "";
+      const tile = document.createElement("button");
+      tile.className = "test-tile" + (hecho ? ` ${estado}` : "");
+      tile.setAttribute("aria-label", `${test.nombre}, ${resumenTest(test)}, ` + (hecho ? `${estado} con ${formatoNota(hecho.nota)}` : "sin hacer"));
+      tile.innerHTML = `<span class="test-label">Test</span><span class="test-num">${i + 1}</span><span class="test-q">${resumenTest(test)}</span>`
+        + (hecho ? `<span class="test-nota">${icono(estado)}${formatoNota(hecho.nota)}</span>` : "");
+      tile.onclick = () => go(`${base}/${i + 1}`);
+      sec.querySelector(".test-grid").appendChild(tile);
+    });
+    box.appendChild(sec);
+  });
+}
+
+// Solo sube al principio al cambiar de pantalla (abrir o cerrar la ventana de modo no mueve la lista)
+let shownMenu = null;
+function showMenu(which, key = which) {
+  const menu = document.getElementById("menu-view");
+  if (menu.style.display === "none" || shownMenu !== key) window.scrollTo(0, 0);
+  shownMenu = key;
+  document.getElementById("quiz-view").style.display = "none";
+  document.getElementById("result-view").style.display = "none";
+  document.getElementById("menu-view").style.display = "block";
+  document.getElementById("home-view").style.display = which === "home" ? "block" : "none";
+  document.getElementById("tit-view").style.display = which === "tit" ? "block" : "none";
+}
+
+function openModal(tit, nivel, test) {
+  document.getElementById("m-sub").textContent = tit.nombre;
+  document.getElementById("m-title").textContent = test.nombre;
+  document.getElementById("m-info").textContent = `${nivel.nombre}. ${resumenTest(test)}.`;
+  document.getElementById("mode-modal").classList.add("open");
+  document.querySelector("#mode-modal .modal").focus({ preventScroll: true });
+}
+
+function closeModal() {
+  document.getElementById("mode-modal").classList.remove("open");
+}
+
+window.addEventListener("keydown", e => {
+  if (e.key === "Escape" && document.getElementById("mode-modal").classList.contains("open")) goMenu();
+});
+
+// El test se lanza desde la ruta; "replace" para que atrás vuelva a la lista y no a la ventana de modo
+function chooseMode(mode) {
+  location.replace(`${currentHash()}/${mode}`);
+}
+
+// NAVEGACIÓN con rutas en el hash (funciona el botón atrás del navegador y del móvil):
+//   #/                                  → titulaciones
+//   #/<titulación>                      → niveles y tests
+//   #/<titulación>/<nivel>/<n>          → ventana para elegir modo
+//   #/<titulación>/<nivel>/<n>/<modo>   → test en marcha (study | exam)
+//   #/<titulación>/<nivel>/aleatorio    → examen aleatorio (siempre en modo examen)
+//   #/<titulación>/<nivel>/falladas     → repaso de falladas: ventana de modo y, con /<modo>, en marcha
+const navStack = [];
+const currentHash = () => location.hash || "#/";
+
+function go(hash) {
+  navStack.push(currentHash());
+  location.hash = hash;
+}
+
+// Vuelve a "fallback" usando el historial si venimos de ahí, para no duplicar entradas
+function goBack(fallback) {
+  if (navStack[navStack.length - 1] === fallback) history.back();
+  else if (currentHash() !== fallback) location.replace(fallback);
+}
+
+window.addEventListener("hashchange", () => {
+  if (navStack[navStack.length - 1] === currentHash()) navStack.pop();
+  route();
+});
+
+function route() {
+  closeModal();
+  const [titId, nivelId, num, mode] = currentHash().slice(2).split("/");
+
+  if (!titId) { renderHome(); return showMenu("home"); }
+  const tit = TITULACIONES.find(t => t.id === titId && numTests(t) > 0);
+  if (!tit) return location.replace("#/");
+
+  if (!nivelId) { renderTitulacion(tit); return showMenu("tit", tit.id); }
+  const nivel = tit.niveles.find(n => n.id === nivelId);
+  const modoValido = !mode || mode === "study" || mode === "exam";
+  if (!nivel || !modoValido) return location.replace(`#/${tit.id}`);
+  activeNivel = nivel;
+  activeListHash = `#/${tit.id}`;
+
+  if (num === "aleatorio") {
+    if (mode) return location.replace(`#/${tit.id}/${nivel.id}/aleatorio`);
+    activeTipo = "aleatorio";
+    activeTest = examenAleatorio(nivel);
+    return empezar("exam");
+  }
+
+  let test;
+  if (num === "falladas") {
+    activeTipo = "falladas";
+    test = examenFalladas(nivel);
+    if (!test.preguntas.length) test = null;
+  } else {
+    activeTipo = "test";
+    activeKey = `${tit.id}/${nivel.id}/${Number(num)}`;
+    test = nivel.tests[Number(num) - 1];
+  }
+  if (!test) return location.replace(`#/${tit.id}`);
+
+  activeTest = test;
+  if (mode) return empezar(mode);
+  renderTitulacion(tit);
+  showMenu("tit", tit.id);
+  openModal(tit, nivel, test);
+}
+
+function startQuiz(mode) {
+  closeModal();
+  activeMode = mode;
+  qIndex = 0;
+  answers = new Array(activeTest.preguntas.length).fill(null);
+
+  document.getElementById("menu-view").style.display = "none";
+  document.getElementById("result-view").style.display = "none";
+  document.getElementById("quiz-view").style.display = "flex";
+  window.scrollTo(0, 0);
+
+  document.getElementById("q-test-name").textContent = activeTest.nombre;
+  const badge = document.getElementById("q-mode-badge");
+  badge.textContent = mode === "study" ? "Modo práctica" : "Modo examen";
+  badge.className = "badge " + (mode === "study" ? "study" : "exam");
+
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const list = activeTest.preguntas;
+  const item = list[qIndex];
+  const userAns = answers[qIndex];
+
+  document.getElementById("q-counter").textContent = `Pregunta ${qIndex + 1} de ${list.length}`;
+  document.getElementById("q-text").textContent = `${qIndex + 1}. ${item.q}`;
+  document.getElementById("q-bar").style.width = `${((qIndex + 1) / list.length) * 100}%`;
+
+  document.getElementById("prev-btn").disabled = (qIndex === 0);
+  document.getElementById("next-btn").disabled = (qIndex === list.length - 1);
+
+  const optsBox = document.getElementById("q-options");
+  optsBox.innerHTML = "";
+  const fb = document.getElementById("q-feedback");
+  fb.className = "feedback";
+
+  Object.entries(item.o).forEach(([k, val]) => {
+    const btn = document.createElement("button");
+    btn.className = "opt-btn";
+    if (userAns !== null) {
+      if (activeMode === "exam") {
+        if (userAns === k) btn.classList.add("sel-exam");
+      } else {
+        if (k === item.ans) btn.classList.add("ok");
+        else if (userAns === k) btn.classList.add("ko");
+      }
+    }
+    btn.innerHTML = `<span class="opt-let">${k}</span><span>${val}</span>`;
+    btn.onclick = () => { answers[qIndex] = k; alResponder(item, k); renderQuestion(); };
+    optsBox.appendChild(btn);
+  });
+
+  if (activeMode === "study" && userAns !== null) {
+    if (userAns === item.ans) {
+      fb.className = "feedback ok";
+      fb.textContent = "Correcto.";
+    } else {
+      fb.className = "feedback ko";
+      fb.textContent = `Incorrecto. La respuesta correcta es la ${item.ans.toUpperCase()}.`;
+    }
+  }
+
+  const dotsBox = document.getElementById("q-dots");
+  dotsBox.innerHTML = "";
+  list.forEach((qItem, i) => {
+    const d = document.createElement("button");
+    d.className = "dot" + (i === qIndex ? " active" : "");
+    d.textContent = i + 1;
+    if (answers[i] !== null) {
+      if (activeMode === "exam") d.classList.add("done-exam");
+      else d.classList.add(answers[i] === qItem.ans ? "done-ok" : "done-ko");
+    }
+    d.onclick = () => { qIndex = i; renderQuestion(); };
+    dotsBox.appendChild(d);
+  });
+}
+
+function step(dir) {
+  const next = qIndex + dir;
+  if (next >= 0 && next < activeTest.preguntas.length) {
+    qIndex = next;
+    renderQuestion();
+  }
+}
+
+function finishQuiz() {
+  const list = activeTest.preguntas;
+  let ok = 0, ko = 0, blank = 0;
+  const rev = document.getElementById("r-list");
+  rev.innerHTML = "";
+
+  list.forEach((item, i) => {
+    const u = answers[i];
+    if (u === null) blank++;
+    else if (u === item.ans) ok++;
+    else ko++;
+
+    const card = document.createElement("div");
+    card.className = "rev-card " + (u === null ? "blank" : (u === item.ans ? "ok" : "ko"));
+    const status = u === null ? "En blanco" : (u === item.ans ? "Correcta" : "Fallada");
+    card.innerHTML = `
+      <div class="rev-head"><span>Pregunta ${i + 1}</span><span class="rev-status">${status}</span></div>
+      <p class="rev-q">${item.q}</p>
+      <p class="rev-line rev-mine">Tu respuesta: <strong>${u ? u.toUpperCase() + ') ' + item.o[u] : 'Sin responder'}</strong></p>
+      ${u !== item.ans ? `<p class="rev-line rev-correct">Correcta: <strong>${item.ans.toUpperCase()}) ${item.o[item.ans]}</strong></p>` : ''}
+    `;
+    rev.appendChild(card);
+  });
+
+  document.getElementById("quiz-view").style.display = "none";
+  document.getElementById("result-view").style.display = "block";
+  window.scrollTo(0, 0);
+  const nota = ((ok / list.length) * 10).toFixed(1);
+  const minimo = minimoAprobado(list.length);
+  const aprobado = ok >= minimo;
+  document.getElementById("res-box").className = "res-box " + (aprobado ? "pass" : "fail");
+  document.getElementById("r-title").textContent = `${activeTest.nombre}, ${activeMode === 'exam' ? 'modo examen' : 'modo práctica'}`;
+  document.getElementById("r-msg").textContent = aprobado ? "Aprobado" : "No aprobado";
+  document.getElementById("r-score").innerHTML = `${ok}<small>/${list.length}</small>`;
+  document.getElementById("r-nota").textContent = `Nota ${nota.replace(".", ",")} sobre 10`;
+  document.getElementById("r-help").textContent = `Para aprobar hacen falta ${minimo} aciertos de ${list.length}.`;
+  document.getElementById("r-ok").innerHTML = `<b>${ok}</b><span>Aciertos</span>`;
+  document.getElementById("r-ko").innerHTML = `<b>${ko}</b><span>Fallos</span>`;
+  document.getElementById("r-blank").innerHTML = `<b>${blank}</b><span>En blanco</span>`;
+  alTerminar(list, ok);
+}
+
+// Volver a la lista de tests de la titulación (desde el test, los resultados o la ventana de modo)
+function goMenu() {
+  goBack(activeListHash);
+}
+
+window.addEventListener("keydown", e => {
+  if (document.getElementById("quiz-view").style.display === "flex") {
+    if (e.key === "ArrowLeft") step(-1);
+    if (e.key === "ArrowRight") step(1);
+  }
+});
+
+route();
+</script>
+</body>
+</html>
